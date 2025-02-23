@@ -6,4 +6,6 @@ export * from "./deleteMessageAfter";
 export * from "./awaitConfirm";
 export * from "./dynaSend";
 
+export * from "./BetterEmbed";
+
 export * from "./types";
