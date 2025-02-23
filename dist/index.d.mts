@@ -402,7 +402,7 @@ interface PageNavigatorOptions {
      *
      * This option also utilizes {@link jsTools.parseTime}, letting you use "10s" or "1m 30s" instead of a number. */
     timeout?: number | string | undefined;
-    /** A custom DJS this.options.config. */
+    /** A custom DJS config. */
     config?: DJSConfig;
     /** What to do after the page navigator times out.
      *
