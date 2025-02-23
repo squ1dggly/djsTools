@@ -16,6 +16,19 @@ export type DynaSendData<T extends SendMethod> = T extends "reply"
     ? MessageCreateOptions
     : never;
 
+type RequiredDynaSendOptions =
+    | (DynaSendOptions & { content: string })
+    | (DynaSendOptions & { embeds: EmbedResolveable | EmbedResolveable[] })
+    | (DynaSendOptions & {
+          components:
+              | ActionRowBuilder<MessageActionRowComponentBuilder>
+              | ActionRowBuilder<MessageActionRowComponentBuilder>[];
+      })
+    | (DynaSendOptions & { files: BaseMessageOptions["files"] })
+    | (DynaSendOptions & { stickers: StickerResolvable[] })
+    | (DynaSendOptions & { poll: PollData })
+    | (DynaSendOptions & { forward: ForwardOptions });
+
 export interface DynaSendOptions {
     /** The method used to send the message.
      *
@@ -195,7 +208,12 @@ function createSendData<T extends SendMethod>(options: DynaSendOptions, sendMeth
     }
 }
 
-export async function dynaSend(handler: SendHandler, options: DynaSendOptions): Promise<Message | null> {
+/** Send a message using a dynamic SendHandler with very customizable options.
+ *
+ * Includes automatic error handling and type checking.
+ * @param handler The handler that'll be used to send the message.
+ * @param options The message options. */
+export async function dynaSend(handler: SendHandler, options: RequiredDynaSendOptions): Promise<Message | null> {
     // Set SendMethod defaults
     options.sendMethod ??=
         handler instanceof BaseInteraction

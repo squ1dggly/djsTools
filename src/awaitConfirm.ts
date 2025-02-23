@@ -1,15 +1,30 @@
 import { SendHandler, EmbedResolveable, UserResolvable } from "./types";
 
-interface AwaitConfirmOptions extends Omit<DynaSendOptions, "embeds" | "components" | "deleteAfter" | "fetchReply"> {
+export interface AwaitConfirmOptions
+    extends Omit<
+        DynaSendOptions,
+        | "embeds"
+        | "components"
+        | "deleteAfter"
+        | "fetchReply"
+        | "deleteAfter"
+        | "files"
+        | "forward"
+        | "poll"
+        | "reply"
+        | "withResponse"
+        | "stickers"
+        | "tts"
+    > {
     /** The users that are allowed to interact with the message. */
-    allowedParticipants: UserResolvable | UserResolvable[];
+    allowedParticipants?: UserResolvable[];
     /** The embed or embed configuration to send. Set to `null` to not send an embed. */
     embed?: EmbedResolveable | null;
-    /** How long to wait before timing out. Use `null` to never timeout.
+    /** How long to wait before timing out. Set to `null` to never timeout.
      *
-     * Defaults to `timeouts.CONFIRMATION`. Configure in `./config.json`.
+     * Defaults to {@link djsConfig.timeouts.CONFIRMATION}.
      *
-     * This option also utilizes {@link jt.parseTime}, letting you use "10s" or "1m 30s" instead of a number. */
+     * This option also utilizes {@link jsTools.parseTime}, letting you use "10s" or "1m 30s" instead of a number. */
     timeout?: number | string | null;
     buttons?: {
         confirm?: { label?: string; emoji?: string };
@@ -20,19 +35,20 @@ interface AwaitConfirmOptions extends Omit<DynaSendOptions, "embeds" | "componen
         deleteOnConfirm?: boolean;
         /** Delete the message after the `cancel` button is pressed. Default is `true`. */
         deleteOnCancel?: boolean;
-        /** Disable the components instead of removing them. Default is `false`. */
+        /** Disable components instead of deleting the message. Default is `false`. */
         disableComponents?: boolean;
     };
+
+    /** A custom DJS config. */
+    config?: DJSConfig;
 }
 
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, Message } from "discord.js";
 
-import dynaSend, { DynaSendOptions } from "./dynaSend";
+import { DynaSendOptions, dynaSend } from "./dynaSend";
+import { DJSConfig, djsConfig } from "./config";
 import BetterEmbed from "./BetterEmbed";
-import logger from "@utils/logger";
-import jt from "@utils/jsTools";
-
-import config from "./config.json";
+import jsTools from "jstools";
 
 /** Send a confirmation message and await the user's response.
 
@@ -41,47 +57,41 @@ export default async function awaitConfirm(
     handler: SendHandler,
     options: AwaitConfirmOptions
 ): Promise<{ message: Message | null; confirmed: boolean }> {
-    const _options = {
-        onResolve: {
-            deleteOnConfirm: true,
-            deleteOnCancel: true,
-            disableComponents: false
-        },
-        ...options,
-        allowedParticipants: jt.forceArray(options.allowedParticipants),
-        timeout: jt.parseTime(options.timeout || config.timeouts.CONFIRMATION)
-    };
+    const __config = options.config || djsConfig;
+
+    // Parse timeout
+    options.timeout = jsTools.parseTime(options.timeout || __config.timeouts.CONFIRMATION);
 
     /* error prevention ( START ) */
-    if (_options.timeout < 1000) {
-        logger.debug("[AwaitConfirm]: 'timeout' is less than 1 second; Is this intentional?");
+    if (options.timeout && (options.timeout as number) < 1000) {
+        console.log("[AwaitConfirm]: 'timeout' is less than 1 second. Is this intentional?");
     }
     /* error prevention ( END ) */
 
     /* - - - - - { Configure the Embed } - - - - - */
-    const embed =
-        _options.embed === undefined
+    const __embed =
+        options.embed === undefined
             ? new BetterEmbed({
-                  title: config.await_confirm.DEFAULT_EMBED_TITLE,
-                  description: config.await_confirm.DEFAULT_EMBED_DESCRIPTION
+                  title: __config.awaitConfirm.DEFAULT_EMBED_TITLE,
+                  description: __config.awaitConfirm.DEFAULT_EMBED_DESCRIPTION
               })
-            : _options.embed === null
-              ? undefined
-              : _options.embed;
+            : options.embed === null
+            ? undefined
+            : options.embed;
 
     /* - - - - - { Action Row  } - - - - - */
     const buttons = {
         confirm: new ButtonBuilder({
+            customId: "btn_confirm",
             label: "Confirm",
             style: ButtonStyle.Success,
-            ...options.buttons?.confirm,
-            custom_id: "btn_confirm"
+            ...options.buttons?.confirm
         }),
         cancel: new ButtonBuilder({
+            customId: "btn_cancel",
             label: "Cancel",
             style: ButtonStyle.Danger,
-            ...options.buttons?.cancel,
-            custom_id: "btn_cancel"
+            ...options.buttons?.cancel
         })
     };
 
@@ -89,12 +99,12 @@ export default async function awaitConfirm(
 
     /* - - - - - { Send the Message } - - - - - */
     const message = await dynaSend(handler, {
-        messageContent: _options.content,
-        embeds: embed,
-        allowedMentions: _options.allowedMentions,
+        sendMethod: options.sendMethod,
+        content: options.content,
+        embeds: __embed,
         components: actionRow,
-        sendMethod: _options.sendMethod,
-        ephemeral: _options.ephemeral
+        flags: options.flags,
+        allowedMentions: options.allowedMentions
     });
 
     // Cancel if the message failed to send
@@ -103,22 +113,23 @@ export default async function awaitConfirm(
     /* - - - - - { Await the User's Decision } - - - - - */
     const cleanUp = async (resolve: (...args: any) => void, confirmed: boolean) => {
         // Delete the message ( CONFIRM )
-        if (confirmed && _options.onResolve.deleteOnConfirm) {
-            if (message?.deletable) await message.delete().catch(null);
+        if (confirmed && (options.onResolve?.deleteOnConfirm ?? true)) {
+            if (message?.deletable) await message.delete().catch(Boolean);
         }
         // Delete the message ( CANCEL )
-        if (!confirmed && _options.onResolve.deleteOnCancel) {
-            if (message?.deletable) await message.delete().catch(null);
+        if (!confirmed && (options.onResolve?.deleteOnCancel ?? true)) {
+            if (message?.deletable) await message.delete().catch(Boolean);
         }
 
         // Return and resolve the promise since the message was deleted
-        if (_options.onResolve.deleteOnConfirm || _options.onResolve.deleteOnCancel) return resolve(confirmed);
+        if ((options.onResolve?.deleteOnConfirm ?? true) || (options.onResolve?.deleteOnCancel ?? true))
+            return resolve(confirmed);
 
         // Disable the components
-        if (_options.onResolve.disableComponents) {
+        if (options.onResolve?.disableComponents) {
             buttons.cancel.setDisabled(true);
             buttons.confirm.setDisabled(true);
-            await message?.edit({ components: [actionRow] }).catch(null);
+            await message?.edit({ components: [actionRow] }).catch(Boolean);
 
             // Resolve the promise
             return resolve({ message, confirmed });
@@ -126,7 +137,9 @@ export default async function awaitConfirm(
     };
 
     // Map the allowed participants to their IDs
-    const allowedParticipantIds = _options.allowedParticipants.map(m => (typeof m === "string" ? m : m.id));
+    const allowedParticipantIds = options.allowedParticipants
+        ? options.allowedParticipants.map(m => (typeof m === "string" ? m : m?.id))
+        : [];
 
     return new Promise(async resolve => {
         const executeAction = async (customId: string) => {
@@ -145,12 +158,15 @@ export default async function awaitConfirm(
         // Wait for the next button interaction
         await message
             .awaitMessageComponent({
-                filter: i => allowedParticipantIds.includes(i.user.id) && ["btn_confirm", "btn_cancel"].includes(i.customId),
+                filter: i =>
+                    allowedParticipantIds.length
+                        ? allowedParticipantIds.includes(i.user.id) && ["btn_confirm", "btn_cancel"].includes(i.customId)
+                        : true,
                 componentType: ComponentType.Button,
-                time: _options.timeout
+                time: options.timeout as number
             })
             .then(async i => {
-                await i.deferUpdate().catch(null);
+                await i.deferUpdate().catch(Boolean);
                 executeAction(i.customId);
             })
             .catch(() => executeAction("btn_cancel"));

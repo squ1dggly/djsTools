@@ -1,5 +1,9 @@
+export * from "./config";
+
+export * from "./dTools";
 export * from "./extractMessage";
 export * from "./deleteMessageAfter";
 
-export * as dTools from "./dTools";
 export * from "./dynaSend";
+
+export * from "./types";

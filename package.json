@@ -17,6 +17,7 @@
         "typescript": "^5.7.3"
     },
     "dependencies": {
+        "@napi-rs/canvas": "^0.1.67",
         "discord.js": "^14.18.0",
         "jstools": "github:squ1dggly/jsTools"
     }

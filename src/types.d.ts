@@ -1,27 +1,15 @@
 import {
-    AnyThreadChannel,
-    CacheType,
-    CategoryChannel,
     CommandInteraction,
     DMChannel,
     EmbedBuilder,
-    GuildBasedChannel,
     GuildMember,
-    InteractionEditReplyOptions,
-    InteractionReplyOptions,
     Message,
-    MessageCreateOptions,
-    MessageEditOptions,
-    MessageReplyOptions,
     NewsChannel,
-    PartialDMChannel,
-    PartialGroupDMChannel,
     RepliableInteraction,
     TextBasedChannel,
     TextChannel,
     ThreadChannel,
-    User,
-    VoiceBasedChannel
+    User
 } from "discord.js";
 import BetterEmbed from "./BetterEmbed";
 
@@ -39,3 +27,8 @@ export type InteractionResolveable = CommandInteraction | RepliableInteraction;
 export type UserResolvable = GuildMember | User | string;
 
 export type SendableTextChannel = DMChannel | TextChannel | NewsChannel | ThreadChannel;
+
+/* - - - - - { Helpers } - - - - - */
+export type DeepPartial<T> = {
+    [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
