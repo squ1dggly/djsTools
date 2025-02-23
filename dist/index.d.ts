@@ -392,7 +392,7 @@ interface AwaitConfirmOptions extends Omit<DynaSendOptions, "embeds" | "componen
      *
      * Defaults to {@link djsConfig.timeouts.CONFIRMATION}.
      *
-     * This option also utilizes {@link jsTools.parseTime}, letting you use "10s" or "1m 30s" instead of a number. */
+     * This option also utilizes {@link parseTime}, letting you use "10s" or "1m 30s" instead of a number. */
     timeout?: number | string | null;
     buttons?: {
         confirm?: {

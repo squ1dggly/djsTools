@@ -385,7 +385,7 @@ async function dynaSend(handler, options) {
 
 // src/BetterEmbed.ts
 var import_discord2 = require("discord.js");
-var import_jstools3 = __toESM(require("jstools"));
+var import_jstools3 = require("jstools");
 var BetterEmbed = class _BetterEmbed {
   embed = new import_discord2.EmbedBuilder();
   config = djsConfig;
@@ -397,7 +397,7 @@ var BetterEmbed = class _BetterEmbed {
     imageURL: null,
     description: null,
     footer: { text: "", icon: null },
-    color: import_jstools3.default.choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) || null,
+    color: (0, import_jstools3.choice)(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) || null,
     timestamp: null,
     fields: [],
     acf: true
@@ -410,7 +410,7 @@ var BetterEmbed = class _BetterEmbed {
     imageURL: null,
     description: null,
     footer: { text: "", icon: null },
-    color: import_jstools3.default.choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) || null,
+    color: (0, import_jstools3.choice)(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) || null,
     timestamp: null,
     fields: [],
     acf: true
@@ -667,7 +667,7 @@ var BetterEmbed = class _BetterEmbed {
   }
   /** Set the embed's color. */
   setColor(color = this.data.color) {
-    let _color = Array.isArray(color) ? import_jstools3.default.choice(color) : color;
+    let _color = Array.isArray(color) ? (0, import_jstools3.choice)(color) : color;
     try {
       this.embed.setColor(_color || null);
     } catch {
@@ -697,13 +697,13 @@ var BetterEmbed = class _BetterEmbed {
     if (data) _embed = this.clone(data);
     return await dynaSend(handler, {
       ...options,
-      embeds: [_embed, ...options?.embeds ? import_jstools3.default.forceArray(options?.embeds) : []]
+      embeds: [_embed, ...options?.embeds ? (0, import_jstools3.forceArray)(options?.embeds) : []]
     });
   }
 };
 
 // src/awaitConfirm.ts
-var import_jstools4 = __toESM(require("jstools"));
+var import_jstools4 = require("jstools");
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   BetterEmbed,

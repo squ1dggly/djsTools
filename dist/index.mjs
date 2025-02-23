@@ -345,7 +345,7 @@ import {
   GuildMember as GuildMember2,
   User as User2
 } from "discord.js";
-import jsTools3 from "jstools";
+import { choice, forceArray } from "jstools";
 var BetterEmbed = class _BetterEmbed {
   embed = new EmbedBuilder();
   config = djsConfig;
@@ -357,7 +357,7 @@ var BetterEmbed = class _BetterEmbed {
     imageURL: null,
     description: null,
     footer: { text: "", icon: null },
-    color: jsTools3.choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) || null,
+    color: choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) || null,
     timestamp: null,
     fields: [],
     acf: true
@@ -370,7 +370,7 @@ var BetterEmbed = class _BetterEmbed {
     imageURL: null,
     description: null,
     footer: { text: "", icon: null },
-    color: jsTools3.choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) || null,
+    color: choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) || null,
     timestamp: null,
     fields: [],
     acf: true
@@ -627,7 +627,7 @@ var BetterEmbed = class _BetterEmbed {
   }
   /** Set the embed's color. */
   setColor(color = this.data.color) {
-    let _color = Array.isArray(color) ? jsTools3.choice(color) : color;
+    let _color = Array.isArray(color) ? choice(color) : color;
     try {
       this.embed.setColor(_color || null);
     } catch {
@@ -657,13 +657,13 @@ var BetterEmbed = class _BetterEmbed {
     if (data) _embed = this.clone(data);
     return await dynaSend(handler, {
       ...options,
-      embeds: [_embed, ...options?.embeds ? jsTools3.forceArray(options?.embeds) : []]
+      embeds: [_embed, ...options?.embeds ? forceArray(options?.embeds) : []]
     });
   }
 };
 
 // src/awaitConfirm.ts
-import jsTools4 from "jstools";
+import { parseTime } from "jstools";
 export {
   BetterEmbed,
   __zero,

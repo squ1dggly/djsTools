@@ -24,7 +24,7 @@ export interface AwaitConfirmOptions
      *
      * Defaults to {@link djsConfig.timeouts.CONFIRMATION}.
      *
-     * This option also utilizes {@link jsTools.parseTime}, letting you use "10s" or "1m 30s" instead of a number. */
+     * This option also utilizes {@link parseTime}, letting you use "10s" or "1m 30s" instead of a number. */
     timeout?: number | string | null;
     buttons?: {
         confirm?: { label?: string; emoji?: string };
@@ -48,7 +48,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, Message } 
 import { DynaSendOptions, dynaSend } from "./dynaSend";
 import { DJSConfig, djsConfig } from "./config";
 import { BetterEmbed } from "./BetterEmbed";
-import jsTools from "jstools";
+import { parseTime } from "jstools";
 
 /** Send a confirmation message and await the user's response.
 
@@ -60,7 +60,7 @@ export default async function awaitConfirm(
     const __config = options.config || djsConfig;
 
     // Parse timeout
-    options.timeout = jsTools.parseTime(options.timeout || __config.timeouts.CONFIRMATION);
+    options.timeout = parseTime(options.timeout || __config.timeouts.CONFIRMATION);
 
     /* error prevention ( START ) */
     if (options.timeout && (options.timeout as number) < 1000) {

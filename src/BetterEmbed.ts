@@ -87,7 +87,7 @@ import {
 } from "discord.js";
 import { DynaSendOptions, dynaSend } from "./dynaSend";
 import { DJSConfig, djsConfig } from "./config";
-import jsTools from "jstools";
+import { choice, forceArray } from "jstools";
 
 /** A powerful wrapper for `EmbedBuilder` that introduces useful features.
  *
@@ -121,7 +121,7 @@ import jsTools from "jstools";
 export class BetterEmbed {
     private embed = new EmbedBuilder();
     private config: DJSConfig = djsConfig;
-    
+
     private dataInit: BetterEmbedData = {
         context: { client: null, interaction: null, channel: null, message: null, user: null },
         author: { context: null, text: "", icon: null, hyperlink: null },
@@ -130,7 +130,9 @@ export class BetterEmbed {
         imageURL: null,
         description: null,
         footer: { text: "", icon: null },
-        color: (jsTools.choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) as HexColorString) || null,
+        color:
+            (choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) as HexColorString) ||
+            null,
         timestamp: null,
         fields: [],
         acf: true
@@ -144,7 +146,9 @@ export class BetterEmbed {
         imageURL: null,
         description: null,
         footer: { text: "", icon: null },
-        color: (jsTools.choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) as HexColorString) || null,
+        color:
+            (choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) as HexColorString) ||
+            null,
         timestamp: null,
         fields: [],
         acf: true
@@ -523,7 +527,7 @@ export class BetterEmbed {
 
     /** Set the embed's color. */
     setColor(color: ColorResolvable | ColorResolvable[] = this.data.color as ColorResolvable): this {
-        let _color = Array.isArray(color) ? jsTools.choice(color) : color;
+        let _color = Array.isArray(color) ? choice(color) : color;
 
         try {
             this.embed.setColor(_color || null);
@@ -565,7 +569,7 @@ export class BetterEmbed {
         // Send the message
         return await dynaSend(handler, {
             ...options,
-            embeds: [_embed, ...(options?.embeds ? jsTools.forceArray(options?.embeds) : [])]
+            embeds: [_embed, ...(options?.embeds ? forceArray(options?.embeds) : [])]
         });
     }
 }
