@@ -1,13 +1,12 @@
 import { AvifConfig, Canvas, createCanvas, GlobalFonts, Image, loadImage, SKRSContext2D } from "@napi-rs/canvas";
-import { join } from "path";
+import { Readable } from "node:stream";
+import { join } from "node:path";
 
 export type MimeType = "image/avif" | "image/jpeg" | "image/png" | "image/webp";
-export type ImageResolveable = string | URL | Buffer | ArrayBufferLike | Uint8Array | Image | import("stream").Readable;
+export type ImageResolveable = string | URL | Buffer | ArrayBufferLike | Uint8Array | Image | Readable;
 export type ColorHex = `#${string}`;
 
-const imageCache: Map<string, Image> = new Map();
-
-interface CanvasOptions {
+export interface CanvasOptions {
     fillColor: ColorHex;
 
     textColor: ColorHex;
@@ -16,7 +15,7 @@ interface CanvasOptions {
     textAlignment: CanvasTextAlign;
 }
 
-interface TextOptions {
+export interface TextOptions {
     x: number;
     y: number;
     color: ColorHex;
@@ -27,7 +26,7 @@ interface TextOptions {
     placeInside?: { x: number; y: number; width: number; height: number };
 }
 
-interface ImageOptions {
+export interface ImageOptions {
     x: number;
     y: number;
     width: number;
@@ -36,6 +35,8 @@ interface ImageOptions {
     padding?: number | { x: number; y: number };
     placeInside?: { x: number; y: number; width: number; height: number };
 }
+
+const imageCache: Map<string, Image> = new Map();
 
 export default class CanvasBuilder {
     canvas: Canvas;
@@ -58,14 +59,14 @@ export default class CanvasBuilder {
         this.ctx.save();
     }
 
-    #tempCanvas() {
+    private tempCanvas() {
         const tempCanvas = createCanvas(this.width, this.height);
         const tempCtx = tempCanvas.getContext("2d");
         tempCtx.save();
         return { canvas: tempCanvas, ctx: tempCtx };
     }
 
-    async #loadImage(source: ImageResolveable) {
+    private async loadImage(source: ImageResolveable) {
         /* Get the image from cache, if applicable */
         if (source instanceof URL && imageCache.has(source.href)) imageCache.get(source.href);
         else if (typeof source === "string" && imageCache.has(source)) imageCache.get(source);
@@ -104,7 +105,7 @@ export default class CanvasBuilder {
     }
 
     async setBackgroundImage(source: ImageResolveable) {
-        const image = await this.#loadImage(source);
+        const image = await this.loadImage(source);
         this.ctx.drawImage(image, 0, 0, this.width, this.height);
         this.ctx.restore();
     }
@@ -137,7 +138,7 @@ export default class CanvasBuilder {
     }
 
     async drawImage(source: ImageResolveable, options: Partial<ImageOptions> = {}) {
-        const image = await this.#loadImage(source);
+        const image = await this.loadImage(source);
         if (!image) throw new Error(`Image source is not valid.`);
 
         const _options: ImageOptions = {
@@ -207,7 +208,7 @@ export default class CanvasBuilder {
         };
 
         if (_options.rounded) {
-            const { ctx } = this.#tempCanvas();
+            const { ctx } = this.tempCanvas();
             _clip(ctx);
             _draw(ctx, true);
             ctx.restore();

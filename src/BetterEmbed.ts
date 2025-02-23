@@ -38,7 +38,7 @@ export interface BetterEmbedData {
     config?: DJSConfig;
 }
 
-interface BetterEmbedAuthor {
+export interface BetterEmbedAuthor {
     /** A user that will be used for Auto-shorthand context formatting (_ACF_).
      *
      * __NOTE:__ There is no reason to provide this unless:
@@ -57,14 +57,14 @@ interface BetterEmbedAuthor {
     hyperlink?: string | null;
 }
 
-interface BetterEmbedTitle {
+export interface BetterEmbedTitle {
     /** Text to be displayed. */
     text: string;
     /** If provided, will turn the title's text into a hyperlink. */
     hyperlink?: string | null;
 }
 
-interface BetterEmbedFooter {
+export interface BetterEmbedFooter {
     /** Text to be displayed. */
     text: string;
     /** Icon to be displayed on the bottom left of the `Embed`.
@@ -120,7 +120,6 @@ import { choice, forceArray } from "jstools";
  * ___NOTE:___ `Client` is also included in `RepliedInteraction` and `Message` contexts. */
 export class BetterEmbed {
     private embed = new EmbedBuilder();
-    private config: DJSConfig = djsConfig;
 
     private dataInit: BetterEmbedData = {
         context: { client: null, interaction: null, channel: null, message: null, user: null },
@@ -197,7 +196,7 @@ export class BetterEmbed {
 
         // prettier-ignore
         str = str
-            .replace(/(?<!\\)\$INVIS\b/g, this.config.INVIS_CHAR)
+            .replace(/(?<!\\)\$INVIS\b/g, this.data.config!.INVIS_CHAR)
 
             // User mentions
             .replace(/(?<!\\|<)@[0-9]+(?!>)/g, s => `<@${s.substring(1)}>`)
@@ -286,14 +285,15 @@ export class BetterEmbed {
         this.setFooter();
         this.addFields(this.data.fields, true);
         this.setColor(
-            choice(this.config.DEV_MODE ? this.config.EMBED_COLOR_DEV : this.config.EMBED_COLOR) as HexColorString
+            choice(
+                this.data.config!.DEV_MODE ? this.data.config!.EMBED_COLOR_DEV : this.data.config!.EMBED_COLOR
+            ) as HexColorString
         );
         this.setTimestamp();
     }
 
     constructor(data: BetterEmbedData) {
-        this.data = { ...this.data, ...data };
-        this.config = this.data.config ?? djsConfig;
+        this.data = { ...this.data, ...data, config: data.config ?? djsConfig };
         this.parseData();
         this.configure();
     }

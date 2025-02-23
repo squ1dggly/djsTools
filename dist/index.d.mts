@@ -1,5 +1,7 @@
-import { DeepPartial as DeepPartial$1 } from 'jstools';
-import { ChannelType, PartialGroupDMChannel, DMChannel, PartialDMChannel, GuildBasedChannel, TextBasedChannel, AnyThreadChannel, VoiceBasedChannel, CategoryChannel, Message, Client, User, Guild, GuildMember, Role, GuildTextBasedChannel, InteractionReplyOptions, ActionRowBuilder, MessageActionRowComponentBuilder, BaseMessageOptions, StickerResolvable, PollData, MessageMentionOptions, ReplyOptions, ForwardOptions, InteractionEditReplyOptions, MessageCreateOptions, MessageReplyOptions, MessageEditOptions, APIEmbedField, ColorResolvable, APIEmbed, EmbedBuilder, CommandInteraction, RepliableInteraction, TextChannel, NewsChannel, ThreadChannel } from 'discord.js';
+import { DeepPartial } from 'jstools';
+import { CommandInteraction, RepliableInteraction, TextBasedChannel, Message, GuildMember, User, EmbedBuilder, DMChannel, TextChannel, NewsChannel, ThreadChannel, InteractionReplyOptions, ActionRowBuilder, MessageActionRowComponentBuilder, BaseMessageOptions, StickerResolvable, PollData, MessageMentionOptions, ReplyOptions, ForwardOptions, InteractionEditReplyOptions, MessageCreateOptions, MessageReplyOptions, MessageEditOptions, Client, APIEmbedField, ColorResolvable, APIEmbed, StringSelectMenuBuilder, ButtonBuilder, StringSelectMenuOptionBuilder, InteractionCollector, StringSelectMenuInteraction, ButtonInteraction, ReactionCollector, ChannelType, PartialGroupDMChannel, PartialDMChannel, GuildBasedChannel, AnyThreadChannel, VoiceBasedChannel, CategoryChannel, Guild, Role, GuildTextBasedChannel } from 'discord.js';
+import { Image } from '@napi-rs/canvas';
+import { Readable } from 'node:stream';
 
 interface DJSConfig {
     INVIS_CHAR: string;
@@ -96,74 +98,40 @@ interface DJSConfig {
     };
 }
 declare const djsConfig: DJSConfig;
-declare function customDJSConfig(config: DeepPartial$1<DJSConfig>): DJSConfig;
+declare function customDJSConfig(config: DeepPartial<DJSConfig>): DJSConfig;
 
-type FetchedChannel<T> = T extends ChannelType.DM ? PartialGroupDMChannel | DMChannel | PartialDMChannel : T extends ChannelType.GuildText ? GuildBasedChannel & TextBasedChannel : T extends ChannelType.PublicThread | ChannelType.PrivateThread | ChannelType.AnnouncementThread ? AnyThreadChannel : T extends ChannelType.GuildVoice ? VoiceBasedChannel : T extends ChannelType.GuildCategory ? CategoryChannel : GuildBasedChannel;
-type MentionType = "users" | "channels" | "roles";
-
-/** Returns the string if it's populated, or "0" otherwise.
- *
- * Useful for fetching where the provided ID may or may not exist.
- * @param str The string to check. */
-declare function __zero(str?: string | undefined | null): string;
-/** Check if the given string is a mention or a snowflake.
- *
- * Looks for formats like `<@123456789>`, or a numeric string with at least 6 digits.
- * @param str The string to check. */
-declare function isMentionOrSnowflake(str: string): boolean;
-/** Remove mention syntax from a string.
- * @param str The string to clean. */
-declare function cleanMention(str: string): string;
-/** Get the ID of the first mention of a specified type from a message or message content.
- * @param options Optional options that aren't really optional. */
-declare function getFirstMentionId(options: {
-    message?: Message;
-    content?: string;
-    type: MentionType;
-}): string;
-/** Fetch a user from the client, checking the cache first.
- * @param client - The client to fetch the user from.
- * @param userId - The ID of the user to fetch. */
-declare function fetchUser(client: Client<true>, userId: string): Promise<User | null>;
-/** Fetch a guild from the client, checking the cache first.
- * @param client - The client to fetch the guild from.
- * @param guildId - The ID of the guild to fetch. */
-declare function fetchGuild(client: Client<true>, guildId: string): Promise<Guild | null>;
-/** Fetch a member from a guild, checking the cache first.
- * @param guild - The guild to fetch the member from.
- * @param memberId - The ID of the member to fetch. */
-declare function fetchMember(guild: Guild, memberId: string): Promise<GuildMember | null>;
-/** Fetch a channel from a guild, checking the cache first.
- *
- * ***NOTE:*** If the channel type does not match the provided type or the channel is null, null is returned.
- * @param guild - The guild to fetch the channel from.
- * @param channelId - The ID of the channel to fetch.
- * @param type - The type of channel to fetch. */
-declare function fetchChannel<T extends ChannelType>(guild: Guild, channelId: string, type?: T): Promise<FetchedChannel<T> | null>;
-/** Fetch a role from a guild, checking the cache first.
- * @param guild - The guild to fetch the role from.
- * @param roleId - The ID of the role to fetch. */
-declare function fetchRole(guild: Guild, roleId: string): Promise<Role | null>;
-/** Fetch a message from a channel, checking the cache first.
- * @param channel - The channel to fetch the message from.
- * @param messageId - The ID of the message to fetch. */
-declare function fetchMessage(channel: GuildTextBasedChannel | VoiceBasedChannel, messageId: string): Promise<Message | null>;
-
-interface ExtractionOptions {
-    /** The amount of embeds to parse in the message. Defaults to `null` (unlimited). */
-    embedDepth: number | null;
-    /** Whether the returned strings should be lowercase. */
-    lowercaseify: boolean;
+type ANSIFormat = "normal" | "bold" | "underline";
+type ANSITextColor = "gray" | "red" | "green" | "yellow" | "blue" | "pink" | "cyan" | "white";
+type ANSIBGColor = "firefly_dark_blue" | "orange" | "marble_blue" | "grayish_turqouise" | "gray" | "indigo" | "light_gray" | "white";
+interface ANSITextOptions {
+    format?: ANSIFormat;
+    color?: ANSITextColor;
+    bgColor?: ANSIBGColor;
+    /** A custom DJS config. */
+    config?: DJSConfig;
 }
-/** Returns every word in the given message, including from `Embeds`. */
-declare function extractMessage(message: Message, options?: ExtractionOptions): string[];
 
-/** Delete a message after a specified amount of time.
- * @param message The message to delete, or a promise resolving to a message.
- * @param delay The time to wait before deleting the message. Defaults to `timeouts.ERROR_MESSAGE`.
+declare class ANSIBuilder {
+    private stringArray;
+    constructor(text?: string, options?: ANSITextOptions);
+    addLines(...lines: {
+        text: string;
+        options: ANSITextOptions;
+    }[]): this;
+    toString(codeblock?: boolean): string;
+}
 
- * This option also utilizes {@link jsTools.parseTime}, letting you use "10s" or "1m 30s" instead of a number. */
-declare function deleteMessageAfter(message: Message | Promise<Message>, delay?: string | number): Promise<Message | null>;
+type SendHandler = CommandInteraction | RepliableInteraction | TextBasedChannel | Message | GuildMember | User;
+type InteractionBasedSendHandler = CommandInteraction | RepliableInteraction;
+type SendMethodInteractionBased = "reply" | "editReply" | "followUp";
+type SendMethodChannelBased = "sendInChannel";
+type SendMethodMessageBased = "messageReply" | "messageEdit";
+type SendMethodUserBased = "dmUser";
+type SendMethod = SendMethodInteractionBased | SendMethodChannelBased | SendMethodMessageBased | SendMethodUserBased;
+type EmbedResolveable = EmbedBuilder | BetterEmbed;
+type InteractionResolveable = CommandInteraction | RepliableInteraction;
+type UserResolvable = GuildMember | User | string;
+type SendableTextChannel = DMChannel | TextChannel | NewsChannel | ThreadChannel;
 
 type DynaSendData<T extends SendMethod> = T extends "reply" ? InteractionReplyOptions : T extends "editReply" ? InteractionEditReplyOptions : T extends "followUp" ? InteractionReplyOptions : T extends "sendInChannel" ? MessageCreateOptions : T extends "messageReply" ? MessageReplyOptions : T extends "messageEdit" ? MessageEditOptions : T extends "dmUser" ? MessageCreateOptions : never;
 type RequiredDynaSendOptions = (DynaSendOptions & {
@@ -329,7 +297,6 @@ interface BetterEmbedFooter {
  * ___NOTE:___ `Client` is also included in `RepliedInteraction` and `Message` contexts. */
 declare class BetterEmbed {
     private embed;
-    private config;
     private dataInit;
     data: BetterEmbedData;
     private applyContextFormatting;
@@ -368,20 +335,229 @@ declare class BetterEmbed {
     send(handler: SendHandler, options?: DynaSendOptions, data?: BetterEmbedData): Promise<Message | null>;
 }
 
-type SendHandler = CommandInteraction | RepliableInteraction | TextBasedChannel | Message | GuildMember | User;
-type InteractionBasedSendHandler = CommandInteraction | RepliableInteraction;
-type SendMethodInteractionBased = "reply" | "editReply" | "followUp";
-type SendMethodChannelBased = "sendInChannel";
-type SendMethodMessageBased = "messageReply" | "messageEdit";
-type SendMethodUserBased = "dmUser";
-type SendMethod = SendMethodInteractionBased | SendMethodChannelBased | SendMethodMessageBased | SendMethodUserBased;
-type EmbedResolveable = EmbedBuilder | BetterEmbed;
-type InteractionResolveable = CommandInteraction | RepliableInteraction;
-type UserResolvable = GuildMember | User | string;
-type SendableTextChannel = DMChannel | TextChannel | NewsChannel | ThreadChannel;
-type DeepPartial<T> = {
-    [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
-};
+type MimeType = "image/avif" | "image/jpeg" | "image/png" | "image/webp";
+type ImageResolveable = string | URL | Buffer | ArrayBufferLike | Uint8Array | Image | Readable;
+type ColorHex = `#${string}`;
+interface CanvasOptions {
+    fillColor: ColorHex;
+    textColor: ColorHex;
+    font: string;
+    fontSize: number;
+    textAlignment: CanvasTextAlign;
+}
+interface TextOptions {
+    x: number;
+    y: number;
+    color: ColorHex;
+    font: string;
+    size: number;
+    align: CanvasTextAlign;
+    style?: "bold" | "italic" | "underline";
+    placeInside?: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    };
+}
+interface ImageOptions {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    rounded: boolean | number;
+    padding?: number | {
+        x: number;
+        y: number;
+    };
+    placeInside?: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    };
+}
+
+type PaginationEvent = "pageChanged" | "pageBack" | "pageNext" | "pageJumped" | "selectMenuOptionPicked" | "timeout";
+type PaginationType = "short" | "shortJump" | "long" | "longJump";
+type PageResolveable = EmbedResolveable | EmbedResolveable[] | PageData | NestedPageData;
+interface PageNavigatorOptions {
+    /** The type of pagination. Defaults to `short`. */
+    type?: PaginationType;
+    /** The user or users that are allowed to interact with the navigator. */
+    allowedParticipants?: UserResolvable[];
+    /** The pages to be displayed. */
+    pages: PageResolveable | PageResolveable[];
+    /** Whether or not to use reactions instead of buttons. */
+    useReactions?: boolean;
+    /** Whether to only add the `Page Jump` action when needed.
+     *
+     * I.E. if there's more than 5 pages, add the `Page Jump` button/reaction.
+     *
+     * ___NOTE:___ The threshold can be configured in the `./this.options.config.json` file. */
+    dynamic?: boolean;
+    /** How long to wait before timing out. Use `undefined` to never timeout.
+     *
+     * Defaults to `timeouts.PAGINATION`. Configure in `./this.options.config.json`.
+     *
+     * This option also utilizes {@link jsTools.parseTime}, letting you use "10s" or "1m 30s" instead of a number. */
+    timeout?: number | string | undefined;
+    /** A custom DJS this.options.config. */
+    config?: DJSConfig;
+    /** What to do after the page navigator times out.
+     *
+     * ___1.___ `disableComponents`: Disable the components. (default: `false`)
+     *
+     * ___2.___ `clearComponents`: Clear the components. (default: `true`)
+     *
+     * ___3.___ `clearReactions`: Clear the reactions. (default: `true`)
+     *
+     * ___4.___ `deleteMessage`: Delete the message. (default: `false`) */
+    postTimeout?: {
+        disableComponents?: boolean;
+        clearComponentsOrReactions?: boolean;
+        deleteMessage?: boolean;
+    };
+}
+interface PageData {
+    content?: string;
+    embed: EmbedResolveable;
+}
+interface NestedPageData {
+    nestedContent?: string[];
+    nestedEmbeds: EmbedResolveable[];
+}
+interface SelectMenuOptionData {
+    /** The emoji to be displayed to the left of the option. */
+    emoji?: string | null;
+    /** The main text to be displayed. */
+    label: string;
+    /** The description to be displayed. */
+    description?: string;
+    /** Custom option ID. Useful if you have custom handling for this option. */
+    value?: string;
+    /** Whether this is the default option. */
+    default?: boolean;
+}
+interface SendOptions extends Omit<DynaSendOptions, "content" | "embeds" | "components"> {
+}
+
+declare class PageNavigator {
+    options: {
+        type: PaginationType;
+        allowedParticipants: UserResolvable[];
+        pages: Array<PageData | NestedPageData>;
+        useReactions: boolean;
+        dynamic: boolean;
+        timeout: number | null;
+        config: DJSConfig;
+        postTimeout: {
+            disableComponents: boolean;
+            clearComponentsOrReactions: boolean;
+            deleteMessage: boolean;
+        };
+    };
+    data: {
+        paginationReactionNames: string[];
+        message: Message | null;
+        messageActionRows: ActionRowBuilder<StringSelectMenuBuilder | ButtonBuilder>[];
+        extraUserButtons: {
+            index: number;
+            component: ButtonBuilder;
+        }[];
+        page: {
+            currentEmbed: EmbedResolveable | null;
+            currentData: PageData | NestedPageData | null;
+            currentMessageContent: string | undefined;
+            index: {
+                current: number;
+                nested: number;
+            };
+        };
+        selectMenu: {
+            currentlySelected: StringSelectMenuOptionBuilder | null;
+            optionIds: string[];
+        };
+        navigation: {
+            reactions: {
+                name: string;
+                id: string;
+            }[];
+            required: boolean;
+            canUseLong: boolean;
+            canJump: boolean;
+        };
+        collectors: {
+            component: InteractionCollector<StringSelectMenuInteraction | ButtonInteraction> | null;
+            reaction: ReactionCollector | null;
+        };
+        components: {
+            actionRows: {
+                selectMenu: ActionRowBuilder<StringSelectMenuBuilder>;
+                navigation: ActionRowBuilder<ButtonBuilder>;
+            };
+            selectMenu: StringSelectMenuBuilder;
+            navigation: {
+                to_first: ButtonBuilder;
+                back: ButtonBuilder;
+                jump: ButtonBuilder;
+                next: ButtonBuilder;
+                to_last: ButtonBuilder;
+            };
+        };
+    };
+    private events;
+    private resolveEmbedsToPages;
+    private createButton;
+    private setPage;
+    private callEventStack;
+    private configure_navigation;
+    private configure_components;
+    private configure_all;
+    private askPageNumber;
+    private navComponents_removeFromMessage;
+    private navReactions_addToMessage;
+    private navReactions_removeFromMessage;
+    private collect_components;
+    private collect_reactions;
+    private collect_all;
+    private handlePostTimeout;
+    constructor(options: PageNavigatorOptions);
+    on(event: "pageChanged", listener: (page: PageData | NestedPageData, index: number) => any, once: boolean): this;
+    on(event: "pageBack", listener: (page: PageData | NestedPageData, index: number) => any, once: boolean): this;
+    on(event: "pageNext", listener: (page: PageData | NestedPageData, index: number) => any, once: boolean): this;
+    on(event: "pageJumped", listener: (page: PageData | NestedPageData, index: number) => any, once: boolean): this;
+    on(event: "selectMenuOptionPicked", listener: (page: PageData | NestedPageData, option: SelectMenuOptionData, index: number) => any, once: boolean): this;
+    on(event: "timeout", listener: (message: Message) => any, once: boolean): this;
+    /** Add one or more options to the select menu component. */
+    addSelectMenuOptions(...options: SelectMenuOptionData[]): this;
+    /** Remove select menu options at the given index/indices.
+     * ```ts
+     * // Remove the options at index 0, 2, and 4
+     * PageNavigator.removeSelectMenuOptions(0, 2, 4);
+     *
+     * // Remove the last option
+     * PageNavigator.removeSelectMenuOptions(-1);
+     * ``` */
+    removeSelectMenuOptions(...index: number[]): this;
+    /** Set the pagination type. */
+    setPaginationType(type: PaginationType): this;
+    /** Allows inserting a button at the given index in the same action row as the navigation buttons. */
+    insertButtonAt(index: number, component: ButtonBuilder): this;
+    /** Remove buttons at the given index/indices.
+     * ```ts
+     * // Remove the button at index 0, 2, and 4
+     * PageNavigator.removeButtonAt(0, 2, 4);
+     *
+     * // Remove the last button
+     * PageNavigator.removeButtonAt(-1);
+     * ``` */
+    removeButtonAt(...index: number[]): this;
+    /** Send the PageNavigator. */
+    send(handler: SendHandler, options?: SendOptions): Promise<Message | null>;
+    /** Refresh the current page embed, navigation, and collectors. */
+    refresh(): Promise<Message | null>;
+}
 
 interface AwaitConfirmOptions extends Omit<DynaSendOptions, "embeds" | "components" | "deleteAfter" | "fetchReply" | "deleteAfter" | "files" | "forward" | "poll" | "reply" | "withResponse" | "stickers" | "tts"> {
     /** The users that are allowed to interact with the message. */
@@ -416,4 +592,71 @@ interface AwaitConfirmOptions extends Omit<DynaSendOptions, "embeds" | "componen
     config?: DJSConfig;
 }
 
-export { type AwaitConfirmOptions, BetterEmbed, type BetterEmbedData, type DJSConfig, type DeepPartial, type DynaSendData, type DynaSendOptions, type EmbedResolveable, type FetchedChannel, type InteractionBasedSendHandler, type InteractionResolveable, type MentionType, type SendHandler, type SendMethod, type SendMethodChannelBased, type SendMethodInteractionBased, type SendMethodMessageBased, type SendMethodUserBased, type SendableTextChannel, type UserResolvable, __zero, cleanMention, customDJSConfig, deleteMessageAfter, djsConfig, dynaSend, extractMessage, fetchChannel, fetchGuild, fetchMember, fetchMessage, fetchRole, fetchUser, getFirstMentionId, isMentionOrSnowflake };
+type FetchedChannel<T> = T extends ChannelType.DM ? PartialGroupDMChannel | DMChannel | PartialDMChannel : T extends ChannelType.GuildText ? GuildBasedChannel & TextBasedChannel : T extends ChannelType.PublicThread | ChannelType.PrivateThread | ChannelType.AnnouncementThread ? AnyThreadChannel : T extends ChannelType.GuildVoice ? VoiceBasedChannel : T extends ChannelType.GuildCategory ? CategoryChannel : GuildBasedChannel;
+type MentionType = "users" | "channels" | "roles";
+
+/** Returns the string if it's populated, or "0" otherwise.
+ *
+ * Useful for fetching where the provided ID may or may not exist.
+ * @param str The string to check. */
+declare function __zero(str?: string | undefined | null): string;
+/** Check if the given string is a mention or a snowflake.
+ *
+ * Looks for formats like `<@123456789>`, or a numeric string with at least 6 digits.
+ * @param str The string to check. */
+declare function isMentionOrSnowflake(str: string): boolean;
+/** Remove mention syntax from a string.
+ * @param str The string to clean. */
+declare function cleanMention(str: string): string;
+/** Get the ID of the first mention of a specified type from a message or message content.
+ * @param options Optional options that aren't really optional. */
+declare function getFirstMentionId(options: {
+    message?: Message;
+    content?: string;
+    type: MentionType;
+}): string;
+/** Fetch a user from the client, checking the cache first.
+ * @param client - The client to fetch the user from.
+ * @param userId - The ID of the user to fetch. */
+declare function fetchUser(client: Client<true>, userId: string): Promise<User | null>;
+/** Fetch a guild from the client, checking the cache first.
+ * @param client - The client to fetch the guild from.
+ * @param guildId - The ID of the guild to fetch. */
+declare function fetchGuild(client: Client<true>, guildId: string): Promise<Guild | null>;
+/** Fetch a member from a guild, checking the cache first.
+ * @param guild - The guild to fetch the member from.
+ * @param memberId - The ID of the member to fetch. */
+declare function fetchMember(guild: Guild, memberId: string): Promise<GuildMember | null>;
+/** Fetch a channel from a guild, checking the cache first.
+ *
+ * ***NOTE:*** If the channel type does not match the provided type or the channel is null, null is returned.
+ * @param guild - The guild to fetch the channel from.
+ * @param channelId - The ID of the channel to fetch.
+ * @param type - The type of channel to fetch. */
+declare function fetchChannel<T extends ChannelType>(guild: Guild, channelId: string, type?: T): Promise<FetchedChannel<T> | null>;
+/** Fetch a role from a guild, checking the cache first.
+ * @param guild - The guild to fetch the role from.
+ * @param roleId - The ID of the role to fetch. */
+declare function fetchRole(guild: Guild, roleId: string): Promise<Role | null>;
+/** Fetch a message from a channel, checking the cache first.
+ * @param channel - The channel to fetch the message from.
+ * @param messageId - The ID of the message to fetch. */
+declare function fetchMessage(channel: GuildTextBasedChannel | VoiceBasedChannel, messageId: string): Promise<Message | null>;
+
+/** Delete a message after a specified amount of time.
+ * @param message The message to delete, or a promise resolving to a message.
+ * @param delay The time to wait before deleting the message. Defaults to `timeouts.ERROR_MESSAGE`.
+
+ * This option also utilizes {@link jsTools.parseTime}, letting you use "10s" or "1m 30s" instead of a number. */
+declare function deleteMessageAfter(message: Message | Promise<Message>, delay?: string | number): Promise<Message | null>;
+
+interface ExtractionOptions {
+    /** The amount of embeds to parse in the message. Defaults to `null` (unlimited). */
+    embedDepth: number | null;
+    /** Whether the returned strings should be lowercase. */
+    lowercaseify: boolean;
+}
+/** Returns every word in the given message, including from `Embeds`. */
+declare function extractMessage(message: Message, options?: ExtractionOptions): string[];
+
+export { type ANSIBGColor, ANSIBuilder, type ANSIFormat, type ANSITextColor, type ANSITextOptions, type AwaitConfirmOptions, BetterEmbed, type BetterEmbedAuthor, type BetterEmbedData, type BetterEmbedFooter, type BetterEmbedTitle, type CanvasOptions, type ColorHex, type DJSConfig, type DynaSendData, type DynaSendOptions, type EmbedResolveable, type FetchedChannel, type ImageOptions, type ImageResolveable, type InteractionBasedSendHandler, type InteractionResolveable, type MentionType, type MimeType, type NestedPageData, type PageData, PageNavigator, type PageNavigatorOptions, type PageResolveable, type PaginationEvent, type PaginationType, type SelectMenuOptionData, type SendHandler, type SendMethod, type SendMethodChannelBased, type SendMethodInteractionBased, type SendMethodMessageBased, type SendMethodUserBased, type SendOptions, type SendableTextChannel, type TextOptions, type UserResolvable, __zero, cleanMention, customDJSConfig, deleteMessageAfter, djsConfig, dynaSend, extractMessage, fetchChannel, fetchGuild, fetchMember, fetchMessage, fetchRole, fetchUser, getFirstMentionId, isMentionOrSnowflake };

@@ -27,8 +27,3 @@ export type InteractionResolveable = CommandInteraction | RepliableInteraction;
 export type UserResolvable = GuildMember | User | string;
 
 export type SendableTextChannel = DMChannel | TextChannel | NewsChannel | ThreadChannel;
-
-/* - - - - - { Helpers } - - - - - */
-export type DeepPartial<T> = {
-    [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
-};
