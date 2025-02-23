@@ -4,6 +4,7 @@ export interface DJSConfig {
     INVIS_CHAR: string;
     EMBED_COLOR: string[];
     EMBED_COLOR_DEV: string[];
+    DEV_MODE: boolean;
 
     timeouts: {
         PAGINATION: string | number;
@@ -72,6 +73,7 @@ export const djsConfig: DJSConfig = {
     INVIS_CHAR: "\u200b",
     EMBED_COLOR: ["#2B2D31"],
     EMBED_COLOR_DEV: ["#2B2D31"],
+    DEV_MODE: false,
 
     timeouts: {
         PAGINATION: "30s",
@@ -141,6 +143,7 @@ export function customDJSConfig(config: DeepPartial<DJSConfig>): DJSConfig {
         INVIS_CHAR: config.INVIS_CHAR || djsConfig.INVIS_CHAR,
         EMBED_COLOR: (config.EMBED_COLOR as string[]) || djsConfig.EMBED_COLOR,
         EMBED_COLOR_DEV: (config.EMBED_COLOR_DEV as string[]) || djsConfig.EMBED_COLOR_DEV,
+        DEV_MODE: config.DEV_MODE || djsConfig.DEV_MODE,
 
         timeouts: { ...config.timeouts, ...djsConfig.timeouts },
         awaitConfirm: { ...config.awaitConfirm, ...djsConfig.awaitConfirm },

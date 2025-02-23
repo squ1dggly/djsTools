@@ -47,7 +47,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, Message } 
 
 import { DynaSendOptions, dynaSend } from "./dynaSend";
 import { DJSConfig, djsConfig } from "./config";
-import BetterEmbed from "./BetterEmbed";
+import { BetterEmbed } from "./BetterEmbed";
 import jsTools from "jstools";
 
 /** Send a confirmation message and await the user's response.

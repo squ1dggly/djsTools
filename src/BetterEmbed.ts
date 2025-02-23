@@ -1,6 +1,6 @@
 import { SendHandler, InteractionResolveable } from "./types";
 
-interface BetterEmbedData {
+export interface BetterEmbedData {
     /** Can be provided for Auto-shorthand context formatting (_ACF_). */
     context?: {
         client?: Client | null;
@@ -23,7 +23,7 @@ interface BetterEmbedData {
     /** Footer to be displayed at the bottom of the `Embed`. */
     footer?: string | BetterEmbedFooter | null;
     /** Fields of the `Embed`. */
-    fields?: APIEmbedField[] | [];
+    fields?: APIEmbedField[];
     /** Color of the `Embed`. */
     color?: ColorResolvable | ColorResolvable[] | null;
     /** The timestamp to be displayed to the right of the `Embed`'s footer.
@@ -33,6 +33,9 @@ interface BetterEmbedData {
 
     /** If `false`, will disable auto-shorthand context formatting. */
     acf?: boolean;
+
+    /** A custom DJS config. */
+    config?: DJSConfig;
 }
 
 interface BetterEmbedAuthor {
@@ -82,12 +85,9 @@ import {
     TextBasedChannel,
     User
 } from "discord.js";
-import dynaSend, { DynaSendOptions } from "./dynaSend";
-import logger from "@utils/logger";
-import jt from "@utils/jsTools";
-
-import { INVIS_CHAR, EMBED_COLOR, EMBED_COLOR_DEV } from "./config.json";
-import { IN_DEV_MODE } from "@constants";
+import { DynaSendOptions, dynaSend } from "./dynaSend";
+import { DJSConfig, djsConfig } from "./config";
+import jsTools from "jstools";
 
 /** A powerful wrapper for `EmbedBuilder` that introduces useful features.
  *
@@ -118,10 +118,11 @@ import { IN_DEV_MODE } from "@constants";
  * - __`$day`__: _D or DD_
  *
  * ___NOTE:___ `Client` is also included in `RepliedInteraction` and `Message` contexts. */
-export default class BetterEmbed {
-    #embed = new EmbedBuilder();
-
-    #dataInit: BetterEmbedData = {
+export class BetterEmbed {
+    private embed = new EmbedBuilder();
+    private config: DJSConfig = djsConfig;
+    
+    private dataInit: BetterEmbedData = {
         context: { client: null, interaction: null, channel: null, message: null, user: null },
         author: { context: null, text: "", icon: null, hyperlink: null },
         title: { text: "", hyperlink: null },
@@ -129,7 +130,7 @@ export default class BetterEmbed {
         imageURL: null,
         description: null,
         footer: { text: "", icon: null },
-        color: (jt.choice(IN_DEV_MODE ? EMBED_COLOR_DEV : EMBED_COLOR) as HexColorString) || null,
+        color: (jsTools.choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) as HexColorString) || null,
         timestamp: null,
         fields: [],
         acf: true
@@ -143,13 +144,13 @@ export default class BetterEmbed {
         imageURL: null,
         description: null,
         footer: { text: "", icon: null },
-        color: (jt.choice(IN_DEV_MODE ? EMBED_COLOR_DEV : EMBED_COLOR) as HexColorString) || null,
+        color: (jsTools.choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) as HexColorString) || null,
         timestamp: null,
         fields: [],
         acf: true
     };
 
-    #applyContextFormatting(str: string): string {
+    private applyContextFormatting(str: string): string {
         if (!str) return "";
         if (!str.includes("$") || !this.data.acf) return str;
 
@@ -196,7 +197,7 @@ export default class BetterEmbed {
 
         // prettier-ignore
         str = str
-            .replace(/(?<!\\)\$INVIS\b/g, INVIS_CHAR)
+            .replace(/(?<!\\)\$INVIS\b/g, this.config.INVIS_CHAR)
 
             // User mentions
             .replace(/(?<!\\|<)@[0-9]+(?!>)/g, s => `<@${s.substring(1)}>`)
@@ -217,7 +218,7 @@ export default class BetterEmbed {
         return str;
     }
 
-    #parseData(): void {
+    private parseData(): void {
         /* - - - - - { Cleanup Shorthand Configurations } - - - - - */
         // prettier-ignore
         if (typeof this.data.author === "string")
@@ -253,10 +254,10 @@ export default class BetterEmbed {
 
         /* - - - - - { Automatic Context Formatting } - - - - - */
         if (this.data.acf) {
-            this.data.author.text = this.#applyContextFormatting(this.data.author.text);
-            this.data.title.text = this.#applyContextFormatting(this.data.title.text);
-            this.data.description = this.#applyContextFormatting(this.data.description || "");
-            this.data.footer.text = this.#applyContextFormatting(this.data.footer.text);
+            this.data.author.text = this.applyContextFormatting(this.data.author.text);
+            this.data.title.text = this.applyContextFormatting(this.data.title.text);
+            this.data.description = this.applyContextFormatting(this.data.description || "");
+            this.data.footer.text = this.applyContextFormatting(this.data.footer.text);
 
             // Author icon
             if (this.data.author.icon === true && this.data.author.context) {
@@ -269,14 +270,14 @@ export default class BetterEmbed {
             }
             // string case
             else if (typeof this.data.author.icon === "string")
-                this.data.author.icon = this.#applyContextFormatting(this.data.author.icon) || null;
+                this.data.author.icon = this.applyContextFormatting(this.data.author.icon) || null;
         } else {
             // Author icon
             if (this.data.author.icon === true) this.data.author.icon = null;
         }
     }
 
-    #configure(): void {
+    private configure(): void {
         this.setAuthor();
         this.setTitle();
         this.setThumbnail();
@@ -290,18 +291,19 @@ export default class BetterEmbed {
 
     constructor(data: BetterEmbedData) {
         this.data = { ...this.data, ...data };
-        this.#parseData();
-        this.#configure();
+        this.config = this.data.config ?? djsConfig;
+        this.parseData();
+        this.configure();
     }
 
     /** Returns a new `BetterEmbed` with the same (or different) configuration. */
     clone(options?: BetterEmbedData): BetterEmbed {
-        return new BetterEmbed({ ...this.data, ...(options || {}) });
+        return new BetterEmbed({ ...this.data, ...options });
     }
 
     /** Serializes this builder to API-compatible JSON data. */
     toJSON(): APIEmbed {
-        return this.#embed.toJSON();
+        return this.embed.toJSON();
     }
 
     /** Set the embed's author. */
@@ -310,7 +312,7 @@ export default class BetterEmbed {
 
         // prettier-ignore
         if (author === null)
-            this.data.author = structuredClone(this.#dataInit.author);
+            this.data.author = structuredClone(this.dataInit.author);
         else if (typeof author === "string")
             this.data.author = { ..._thisAuthor, text: author };
         else
@@ -318,36 +320,36 @@ export default class BetterEmbed {
 
         // Parse the updated author data
         // mainly just for the 'icon' property
-        this.#parseData();
+        this.parseData();
 
         // Author > .text
         if (_thisAuthor.text) {
-            this.#embed.setAuthor({ name: _thisAuthor.text });
+            this.embed.setAuthor({ name: _thisAuthor.text });
         }
 
         // Author > .icon
         if (_thisAuthor?.icon) {
             try {
-                this.#embed.setAuthor({
-                    name: this.#embed.data.author?.name || "", // NOT-USED
+                this.embed.setAuthor({
+                    name: this.embed.data.author?.name || "", // NOT-USED
                     iconURL: (_thisAuthor?.icon as string) || undefined,
-                    url: this.#embed.data.author?.url // NOT-USED
+                    url: this.embed.data.author?.url // NOT-USED
                 });
             } catch (err) {
-                logger.error("[BetterEmbed]", `INVALID_AUTHOR_ICON | '${_thisAuthor.icon}'`, err);
+                console.error("[BetterEmbed]", `INVALID_AUTHOR_ICON | '${_thisAuthor.icon}'`, err);
             }
         }
 
         // Author > .hyperlink
         if (_thisAuthor?.hyperlink) {
             try {
-                this.#embed.setAuthor({
-                    name: this.#embed.data.author?.name || "", // NOT-USED
-                    iconURL: this.#embed.data.author?.icon_url, // NOT-USED
+                this.embed.setAuthor({
+                    name: this.embed.data.author?.name || "", // NOT-USED
+                    iconURL: this.embed.data.author?.icon_url, // NOT-USED
                     url: (_thisAuthor.hyperlink as string) || undefined
                 });
             } catch (err) {
-                logger.error("[BetterEmbed]", `INVALID_AUTHOR_HYPERLINK | '${_thisAuthor.hyperlink}'`, err);
+                console.error("[BetterEmbed]", `INVALID_AUTHOR_HYPERLINK | '${_thisAuthor.hyperlink}'`, err);
             }
         }
 
@@ -360,26 +362,26 @@ export default class BetterEmbed {
 
         // prettier-ignore
         if (title === null)
-            this.data.author = structuredClone(this.#dataInit.title);
+            this.data.author = structuredClone(this.dataInit.title);
         else if (typeof title === "string")
             this.data.author = { ..._thisTitle, text: title };
         else
             this.data.author = { ..._thisTitle, ...title };
 
         // Parse the updated author data
-        this.#parseData();
+        this.parseData();
 
         // Title > .text
         if (_thisTitle.text) {
-            this.#embed.setTitle(_thisTitle.text);
+            this.embed.setTitle(_thisTitle.text);
         }
 
         // Title > .hyperlink
         if (_thisTitle?.hyperlink) {
             try {
-                this.#embed.setURL(_thisTitle.hyperlink || null);
+                this.embed.setURL(_thisTitle.hyperlink || null);
             } catch (err) {
-                logger.error("[BetterEmbed]", `INVALID_TITLE_HYPERLINK | '${_thisTitle.hyperlink}'`, err);
+                console.error("[BetterEmbed]", `INVALID_TITLE_HYPERLINK | '${_thisTitle.hyperlink}'`, err);
             }
         }
 
@@ -388,12 +390,12 @@ export default class BetterEmbed {
 
     /** Set the embed's thumbnail. */
     setThumbnail(url: string | null = this.data.thumbnailURL as string | null): this {
-        if (url) url = this.#applyContextFormatting(url.trim());
+        if (url) url = this.applyContextFormatting(url.trim());
 
         try {
-            this.#embed.setThumbnail(url);
+            this.embed.setThumbnail(url);
         } catch (err) {
-            logger.error("[BetterEmbed]", `INVALID_THUMBNAIL_URL | '${this.data.thumbnailURL}'`);
+            console.error("[BetterEmbed]", `INVALID_THUMBNAIL_URL | '${this.data.thumbnailURL}'`);
             return this;
         }
 
@@ -403,20 +405,20 @@ export default class BetterEmbed {
 
     /** Set the embed's description. */
     setDescription(description: string | null = this.data.description as string): this {
-        if (description) description = this.#applyContextFormatting(description);
-        this.#embed.setDescription(description || null);
+        if (description) description = this.applyContextFormatting(description);
+        this.embed.setDescription(description || null);
         this.data.description = description;
         return this;
     }
 
     /** Set the embed's image. */
     setImage(url: string | null = this.data.imageURL as string): this {
-        if (url) url = this.#applyContextFormatting(url.trim());
+        if (url) url = this.applyContextFormatting(url.trim());
 
         try {
-            this.#embed.setImage(url);
+            this.embed.setImage(url);
         } catch {
-            logger.error("[BetterEmbed]", `INVALID_IMAGE_URL | '${this.data.imageURL}'`);
+            console.error("[BetterEmbed]", `INVALID_IMAGE_URL | '${this.data.imageURL}'`);
             return this;
         }
 
@@ -430,29 +432,29 @@ export default class BetterEmbed {
 
         // prettier-ignore
         if (footer === null)
-			this.data.footer = structuredClone(this.#dataInit.footer);
+			this.data.footer = structuredClone(this.dataInit.footer);
 		else if (typeof footer === "string")
 			this.data.footer = { ..._thisFooter, text: footer };
 		else
             this.data.footer = { ..._thisFooter, ...footer };
 
         // Parse the updated footer data
-        this.#parseData();
+        this.parseData();
 
         // Footer > .text
         if (_thisFooter.text) {
-            this.#embed.setFooter({ text: _thisFooter.text });
+            this.embed.setFooter({ text: _thisFooter.text });
         }
 
         // Footer > .icon
         if (_thisFooter.icon) {
             try {
-                this.#embed.setFooter({
-                    text: this.#embed.data.footer?.text || "", // NOT-USED
+                this.embed.setFooter({
+                    text: this.embed.data.footer?.text || "", // NOT-USED
                     iconURL: (_thisFooter.icon as string) || undefined
                 });
             } catch (err) {
-                logger.error("[BetterEmbed]", `INVALID_FOOTER_ICON | '${_thisFooter.icon}'`, err);
+                console.error("[BetterEmbed]", `INVALID_FOOTER_ICON | '${_thisFooter.icon}'`, err);
             }
         }
 
@@ -468,7 +470,7 @@ export default class BetterEmbed {
         // Clear all fields
         if (replaceAll && !fieldData?.length) {
             this.data.fields = [];
-            this.#embed.spliceFields(0, this.#embed.data.fields?.length || 0);
+            this.embed.spliceFields(0, this.embed.data.fields?.length || 0);
             return this;
         }
 
@@ -481,23 +483,23 @@ export default class BetterEmbed {
             // Trim the array
             fieldData = fieldData.slice(0, 25);
             // prettier-ignore
-            logger.log(`[BetterEmbed] You can only have a MAX of 25 fields. ${_trimLength} ${_trimLength === 1 ? "field has" : "fields have"} been trimmed`);
+            console.log(`[BetterEmbed] You can only have a MAX of 25 fields. ${_trimLength} ${_trimLength === 1 ? "field has" : "fields have"} been trimmed`);
         }
 
         // Apply ACF
         if (this.data.acf) {
             for (let i = 0; i < fieldData.length; i++) {
-                fieldData[i].name = this.#applyContextFormatting(fieldData[i].name);
-                fieldData[i].value = this.#applyContextFormatting(fieldData[i].value);
+                fieldData[i].name = this.applyContextFormatting(fieldData[i].name);
+                fieldData[i].value = this.applyContextFormatting(fieldData[i].value);
             }
         }
 
         if (replaceAll) {
             this.data.fields = fieldData;
-            this.#embed.setFields(fieldData);
+            this.embed.setFields(fieldData);
         } else {
             _thisFields.push(...fieldData);
-            this.#embed.addFields(fieldData);
+            this.embed.addFields(fieldData);
         }
 
         return this;
@@ -521,12 +523,12 @@ export default class BetterEmbed {
 
     /** Set the embed's color. */
     setColor(color: ColorResolvable | ColorResolvable[] = this.data.color as ColorResolvable): this {
-        let _color = Array.isArray(color) ? jt.choice(color) : color;
+        let _color = Array.isArray(color) ? jsTools.choice(color) : color;
 
         try {
-            this.#embed.setColor(_color || null);
+            this.embed.setColor(_color || null);
         } catch {
-            logger.error("[BetterEmbed]", `INVALID_COLOR | '${this.data.color}'`);
+            console.error("[BetterEmbed]", `INVALID_COLOR | '${this.data.color}'`);
             return this;
         }
 
@@ -539,9 +541,9 @@ export default class BetterEmbed {
         if (timestamp === true) timestamp = Date.now();
 
         try {
-            this.#embed.setTimestamp(timestamp as Date | number | null);
+            this.embed.setTimestamp(timestamp as Date | number | null);
         } catch {
-            logger.error("[BetterEmbed]", `INVALID_TIMESTAMP | '${this.data.timestamp}'`);
+            console.error("[BetterEmbed]", `INVALID_TIMESTAMP | '${this.data.timestamp}'`);
             return this;
         }
 
@@ -552,11 +554,10 @@ export default class BetterEmbed {
     /** Send the embed. */
     async send(handler: SendHandler, options?: DynaSendOptions, data?: BetterEmbedData): Promise<Message | null> {
         let _embed: BetterEmbed = this;
-        this.#parseData();
+        this.parseData();
 
         // Apply ACF to message content
-        if (options?.content && this.data.acf)
-            options.content = this.#applyContextFormatting(options.content);
+        if (options?.content && this.data.acf) options.content = this.applyContextFormatting(options.content);
 
         // Clone the embed
         if (data) _embed = this.clone(data);
@@ -564,7 +565,7 @@ export default class BetterEmbed {
         // Send the message
         return await dynaSend(handler, {
             ...options,
-            embeds: [_embed, ...(options?.embeds ? jt.forceArray(options?.embeds) : [])]
+            embeds: [_embed, ...(options?.embeds ? jsTools.forceArray(options?.embeds) : [])]
         });
     }
 }
