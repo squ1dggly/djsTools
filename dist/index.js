@@ -1334,7 +1334,8 @@ var PageNavigator = class {
       ...options,
       content: this.data.page.currentMessageContent,
       embeds: this.data.page.currentEmbed,
-      components: this.data.messageActionRows
+      components: this.data.messageActionRows,
+      withResponse: true
     });
     if (this.data.message) {
       this.navReactions_addToMessage();
@@ -1357,7 +1358,8 @@ var PageNavigator = class {
       sendMethod: "messageEdit",
       content: this.data.page.currentMessageContent,
       embeds: this.data.page.currentEmbed,
-      components: this.data.messageActionRows
+      components: this.data.messageActionRows,
+      withResponse: true
     });
     if (this.data.message) {
       this.navReactions_removeFromMessage().then(() => this.navReactions_addToMessage());

@@ -865,7 +865,8 @@ export class PageNavigator {
             ...options,
             content: this.data.page.currentMessageContent,
             embeds: this.data.page.currentEmbed!,
-            components: this.data.messageActionRows
+            components: this.data.messageActionRows,
+            withResponse: true
         });
 
         if (this.data.message) {
@@ -902,7 +903,8 @@ export class PageNavigator {
             sendMethod: "messageEdit",
             content: this.data.page.currentMessageContent,
             embeds: this.data.page.currentEmbed!,
-            components: this.data.messageActionRows
+            components: this.data.messageActionRows,
+            withResponse: true
         });
 
         if (this.data.message) {
