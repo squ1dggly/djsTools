@@ -357,7 +357,7 @@ var BetterEmbed = class _BetterEmbed {
     imageURL: null,
     description: null,
     footer: { text: "", icon: null },
-    color: choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) || null,
+    color: null,
     timestamp: null,
     fields: [],
     acf: true
@@ -370,7 +370,7 @@ var BetterEmbed = class _BetterEmbed {
     imageURL: null,
     description: null,
     footer: { text: "", icon: null },
-    color: choice(djsConfig.DEV_MODE ? djsConfig.EMBED_COLOR_DEV : djsConfig.EMBED_COLOR) || null,
+    color: null,
     timestamp: null,
     fields: [],
     acf: true
@@ -446,7 +446,9 @@ var BetterEmbed = class _BetterEmbed {
     this.setImage();
     this.setFooter();
     this.addFields(this.data.fields, true);
-    this.setColor();
+    this.setColor(
+      choice(this.config.DEV_MODE ? this.config.EMBED_COLOR_DEV : this.config.EMBED_COLOR)
+    );
     this.setTimestamp();
   }
   constructor(data) {
