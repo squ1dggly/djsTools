@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 
-interface ExtractionOptions {
+export interface ExtractionOptions {
     /** The amount of embeds to parse in the message. Defaults to `null` (unlimited). */
     embedDepth: number | null;
     /** Whether the returned strings should be lowercase. */

@@ -1,4 +1,6 @@
+import * as jstools from 'jstools';
 import { DeepPartial } from 'jstools';
+import * as discord_js from 'discord.js';
 import { CommandInteraction, RepliableInteraction, TextBasedChannel, Message, GuildMember, User, EmbedBuilder, DMChannel, TextChannel, NewsChannel, ThreadChannel, InteractionReplyOptions, ActionRowBuilder, MessageActionRowComponentBuilder, BaseMessageOptions, StickerResolvable, PollData, MessageMentionOptions, ReplyOptions, ForwardOptions, InteractionEditReplyOptions, MessageCreateOptions, MessageReplyOptions, MessageEditOptions, Client, APIEmbedField, ColorResolvable, APIEmbed, StringSelectMenuBuilder, ButtonBuilder, StringSelectMenuOptionBuilder, InteractionCollector, StringSelectMenuInteraction, ButtonInteraction, ReactionCollector, ChannelType, PartialGroupDMChannel, PartialDMChannel, GuildBasedChannel, AnyThreadChannel, VoiceBasedChannel, CategoryChannel, Guild, Role, GuildTextBasedChannel } from 'discord.js';
 import { Image } from '@napi-rs/canvas';
 import { Readable } from 'node:stream';
@@ -659,4 +661,47 @@ interface ExtractionOptions {
 /** Returns every word in the given message, including from `Embeds`. */
 declare function extractMessage(message: Message, options?: ExtractionOptions): string[];
 
-export { type ANSIBGColor, ANSIBuilder, type ANSIFormat, type ANSITextColor, type ANSITextOptions, type AwaitConfirmOptions, BetterEmbed, type BetterEmbedAuthor, type BetterEmbedData, type BetterEmbedFooter, type BetterEmbedTitle, type CanvasOptions, type ColorHex, type DJSConfig, type DynaSendData, type DynaSendOptions, type EmbedResolveable, type FetchedChannel, type ImageOptions, type ImageResolveable, type InteractionBasedSendHandler, type InteractionResolveable, type MentionType, type MimeType, type NestedPageData, type PageData, PageNavigator, type PageNavigatorOptions, type PageResolveable, type PaginationEvent, type PaginationType, type SelectMenuOptionData, type SendHandler, type SendMethod, type SendMethodChannelBased, type SendMethodInteractionBased, type SendMethodMessageBased, type SendMethodUserBased, type SendOptions, type SendableTextChannel, type TextOptions, type UserResolvable, __zero, cleanMention, customDJSConfig, deleteMessageAfter, djsConfig, dynaSend, extractMessage, fetchChannel, fetchGuild, fetchMember, fetchMessage, fetchRole, fetchUser, getFirstMentionId, isMentionOrSnowflake };
+declare const _default: {
+    extractMessage(message: discord_js.Message, options?: ExtractionOptions): string[];
+    dynaSend(handler: SendHandler, options: (DynaSendOptions & {
+        content: string;
+    }) | (DynaSendOptions & {
+        embeds: EmbedResolveable | EmbedResolveable[];
+    }) | (DynaSendOptions & {
+        components: discord_js.ActionRowBuilder<discord_js.MessageActionRowComponentBuilder> | discord_js.ActionRowBuilder<discord_js.MessageActionRowComponentBuilder>[];
+    }) | (DynaSendOptions & {
+        files: discord_js.BaseMessageOptions["files"];
+    }) | (DynaSendOptions & {
+        stickers: discord_js.StickerResolvable[];
+    }) | (DynaSendOptions & {
+        poll: discord_js.PollData;
+    }) | (DynaSendOptions & {
+        forward: discord_js.ForwardOptions;
+    })): Promise<discord_js.Message | null>;
+    deleteMessageAfter(message: discord_js.Message | Promise<discord_js.Message>, delay?: string | number): Promise<discord_js.Message | null>;
+    __zero(str?: string | undefined | null): string;
+    isMentionOrSnowflake(str: string): boolean;
+    cleanMention(str: string): string;
+    getFirstMentionId(options: {
+        message?: discord_js.Message;
+        content?: string;
+        type: MentionType;
+    }): string;
+    fetchUser(client: discord_js.Client<true>, userId: string): Promise<discord_js.User | null>;
+    fetchGuild(client: discord_js.Client<true>, guildId: string): Promise<discord_js.Guild | null>;
+    fetchMember(guild: discord_js.Guild, memberId: string): Promise<discord_js.GuildMember | null>;
+    fetchChannel<T extends discord_js.ChannelType>(guild: discord_js.Guild, channelId: string, type?: T): Promise<FetchedChannel<T> | null>;
+    fetchRole(guild: discord_js.Guild, roleId: string): Promise<discord_js.Role | null>;
+    fetchMessage(channel: discord_js.GuildTextBasedChannel | discord_js.VoiceBasedChannel, messageId: string): Promise<discord_js.Message | null>;
+    customDJSConfig(config: jstools.DeepPartial<DJSConfig>): DJSConfig;
+    djsConfig: DJSConfig;
+    default(handler: SendHandler, options: AwaitConfirmOptions): Promise<{
+        message: discord_js.Message | null;
+        confirmed: boolean;
+    }>;
+    PageNavigator: typeof PageNavigator;
+    BetterEmbed: typeof BetterEmbed;
+    ANSIBuilder: typeof ANSIBuilder;
+};
+
+export { type ANSIBGColor, ANSIBuilder, type ANSIFormat, type ANSITextColor, type ANSITextOptions, type AwaitConfirmOptions, BetterEmbed, type BetterEmbedAuthor, type BetterEmbedData, type BetterEmbedFooter, type BetterEmbedTitle, type CanvasOptions, type ColorHex, type DJSConfig, type DynaSendData, type DynaSendOptions, type EmbedResolveable, type ExtractionOptions, type FetchedChannel, type ImageOptions, type ImageResolveable, type InteractionBasedSendHandler, type InteractionResolveable, type MentionType, type MimeType, type NestedPageData, type PageData, PageNavigator, type PageNavigatorOptions, type PageResolveable, type PaginationEvent, type PaginationType, type SelectMenuOptionData, type SendHandler, type SendMethod, type SendMethodChannelBased, type SendMethodInteractionBased, type SendMethodMessageBased, type SendMethodUserBased, type SendOptions, type SendableTextChannel, type TextOptions, type UserResolvable, __zero, cleanMention, customDJSConfig, _default as default, deleteMessageAfter, djsConfig, dynaSend, extractMessage, fetchChannel, fetchGuild, fetchMember, fetchMessage, fetchRole, fetchUser, getFirstMentionId, isMentionOrSnowflake };

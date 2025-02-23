@@ -1,4 +1,21 @@
+var __defProp = Object.defineProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+
+// src/AnsiBuilder.ts
+var AnsiBuilder_exports = {};
+__export(AnsiBuilder_exports, {
+  ANSIBuilder: () => ANSIBuilder
+});
+
 // src/config.ts
+var config_exports = {};
+__export(config_exports, {
+  customDJSConfig: () => customDJSConfig,
+  djsConfig: () => djsConfig
+});
 var djsConfig = {
   INVIS_CHAR: "\u200B",
   EMBED_COLOR: ["#2B2D31"],
@@ -94,6 +111,10 @@ ${ansi}
 };
 
 // src/BetterEmbed.ts
+var BetterEmbed_exports = {};
+__export(BetterEmbed_exports, {
+  BetterEmbed: () => BetterEmbed
+});
 import {
   EmbedBuilder,
   GuildMember as GuildMember2,
@@ -101,6 +122,10 @@ import {
 } from "discord.js";
 
 // src/dynaSend.ts
+var dynaSend_exports = {};
+__export(dynaSend_exports, {
+  dynaSend: () => dynaSend
+});
 import {
   BaseChannel,
   BaseInteraction,
@@ -111,6 +136,10 @@ import {
 } from "discord.js";
 
 // src/deleteMessageAfter.ts
+var deleteMessageAfter_exports = {};
+__export(deleteMessageAfter_exports, {
+  deleteMessageAfter: () => deleteMessageAfter
+});
 import jsTools from "jstools";
 async function deleteMessageAfter(message, delay = djsConfig.timeouts.ERROR_MESSAGE) {
   delay = jsTools.parseTime(delay);
@@ -614,10 +643,180 @@ var BetterEmbed = class _BetterEmbed {
 };
 
 // src/CanvasBuilder.ts
+var CanvasBuilder_exports = {};
+__export(CanvasBuilder_exports, {
+  default: () => CanvasBuilder
+});
 import { createCanvas, GlobalFonts, loadImage } from "@napi-rs/canvas";
 import { join } from "node:path";
+var imageCache = /* @__PURE__ */ new Map();
+var CanvasBuilder = class {
+  constructor(width, height, options = {}) {
+    this.width = width;
+    this.height = height;
+    this.options = { ...this.options, ...options };
+    this.canvas = createCanvas(this.width, this.height);
+    this.ctx = this.canvas.getContext("2d");
+    this.ctx.save();
+  }
+  canvas;
+  ctx;
+  options = {
+    fillColor: "#ffffff",
+    textColor: "#000000",
+    font: "serif",
+    fontSize: 12,
+    textAlignment: "left"
+  };
+  tempCanvas() {
+    const tempCanvas = createCanvas(this.width, this.height);
+    const tempCtx = tempCanvas.getContext("2d");
+    tempCtx.save();
+    return { canvas: tempCanvas, ctx: tempCtx };
+  }
+  async loadImage(source) {
+    if (source instanceof URL && imageCache.has(source.href)) imageCache.get(source.href);
+    else if (typeof source === "string" && imageCache.has(source)) imageCache.get(source);
+    const image = await loadImage(source);
+    if (source instanceof URL) imageCache.set(source.href, image);
+    else if (typeof source === "string") imageCache.set(source, image);
+    return image;
+  }
+  /** Load a font from the specified path and assign it to an alias.
+   * Returns whether the font was loaded successfully.
+   * @param path Path to the font file.
+   * @param alias The alias to assign to the font.
+   * @param relative Whether the path is relative to `process.cwd()`. */
+  loadFont(path, alias, relative = true) {
+    return GlobalFonts.registerFromPath(relative ? join(process.cwd(), path) : path, alias);
+  }
+  measureText(text) {
+    return this.ctx.measureText(text);
+  }
+  clear(x = 0, y = 0, width = this.width, height = this.height) {
+    this.ctx.clearRect(x, y, width, height);
+  }
+  setBackgroundColor(color = this.options.fillColor) {
+    this.ctx.fillStyle = color;
+    this.ctx.fillRect(0, 0, this.width, this.height);
+    this.ctx.restore();
+  }
+  async setBackgroundImage(source) {
+    const image = await this.loadImage(source);
+    this.ctx.drawImage(image, 0, 0, this.width, this.height);
+    this.ctx.restore();
+  }
+  fillText(text, options = {}) {
+    const _options = {
+      x: 0,
+      y: 0,
+      color: this.options.textColor,
+      font: this.options.font,
+      size: this.options.fontSize,
+      align: this.options.textAlignment,
+      ...options
+    };
+    this.ctx.fillStyle = _options.color;
+    this.ctx.font = `${_options.style || ""}${_options.size}px ${_options.font}`.trim();
+    this.ctx.textAlign = _options.align;
+    if (_options.placeInside) {
+      const { x, y, width, height } = _options.placeInside;
+      const metrics = this.ctx.measureText(text);
+      this.ctx.textAlign = "center";
+      this.ctx.fillText(text, x + _options.x + width / 2, y + _options.y + height / 2 + metrics.emHeightAscent / 2);
+    } else {
+      this.ctx.fillText(text, _options.x, _options.y);
+    }
+    this.ctx.restore();
+  }
+  async drawImage(source, options = {}) {
+    const image = await this.loadImage(source);
+    if (!image) throw new Error(`Image source is not valid.`);
+    const _options = {
+      x: 0,
+      y: 0,
+      width: image.width,
+      height: image.height,
+      rounded: false,
+      ...options
+    };
+    const px = (typeof _options.padding === "number" ? _options.padding : _options.padding?.x) || 0;
+    const py = (typeof _options.padding === "number" ? _options.padding : _options.padding?.y) || 0;
+    const _draw = (_ctx, mergeWithMainCanvas) => {
+      if (_options.placeInside) {
+        const { x, y, width, height } = _options.placeInside;
+        _ctx.drawImage(
+          image,
+          x + _options.x + width / 2 - _options.width / 2 - px,
+          y + _options.y + height / 2 - _options.height / 2 - py,
+          _options.width,
+          _options.height
+        );
+      } else {
+        _ctx.drawImage(image, _options.x + px, _options.y + py, _options.width, _options.height);
+      }
+      if (mergeWithMainCanvas) {
+        this.ctx.drawImage(_ctx.canvas, 0, 0);
+      }
+      _ctx.restore();
+    };
+    const _clip = (_ctx) => {
+      if (!_options.rounded) return;
+      let x = 0, y = 0;
+      if (_options.placeInside) {
+        const { x: _x, y: _y, width: _width, height: _height } = _options.placeInside;
+        x = _options.x + _width / 2 - _options.width / 2 - px;
+        y = _options.y + _height / 2 - _options.height / 2 - py;
+      } else {
+        x = _options.x + px;
+        y = _options.y + py;
+      }
+      if (typeof _options.rounded === "number") {
+        _ctx.beginPath();
+        _ctx.moveTo(_options.x + _options.rounded, _options.y);
+        _ctx.arcTo(x + _options.width, y, x + _options.width, y + _options.height, _options.rounded);
+        _ctx.arcTo(x + _options.width, y + _options.height, x, y + _options.height, _options.rounded);
+        _ctx.arcTo(x, y + _options.height, x, y, _options.rounded);
+        _ctx.arcTo(x, y, x + _options.width, y, _options.rounded);
+        _ctx.closePath();
+        _ctx.clip();
+      } else {
+        _ctx.beginPath();
+        _ctx.arc(x + _options.width / 2, y + _options.height / 2, _options.width / 2, 0, 2 * Math.PI);
+        _ctx.closePath();
+        _ctx.clip();
+      }
+    };
+    if (_options.rounded) {
+      const { ctx } = this.tempCanvas();
+      _clip(ctx);
+      _draw(ctx, true);
+      ctx.restore();
+    } else {
+      _clip(this.ctx);
+      _draw(this.ctx, false);
+      this.ctx.restore();
+    }
+  }
+  toBuffer(mime, cfgOrQuality) {
+    switch (mime) {
+      case "image/avif":
+        return this.canvas.toBuffer("image/avif", cfgOrQuality);
+      case "image/jpeg":
+        return this.canvas.toBuffer("image/jpeg", cfgOrQuality);
+      case "image/webp":
+        return this.canvas.toBuffer("image/webp", cfgOrQuality);
+      case "image/png":
+        return this.canvas.toBuffer("image/png");
+    }
+  }
+};
 
 // src/PageNavigator.ts
+var PageNavigator_exports = {};
+__export(PageNavigator_exports, {
+  PageNavigator: () => PageNavigator
+});
 import {
   ActionRowBuilder as ActionRowBuilder2,
   ButtonBuilder,
@@ -1137,10 +1336,99 @@ var PageNavigator = class {
 };
 
 // src/awaitConfirm.ts
+var awaitConfirm_exports = {};
+__export(awaitConfirm_exports, {
+  default: () => awaitConfirm
+});
 import { ActionRowBuilder as ActionRowBuilder3, ButtonBuilder as ButtonBuilder2, ButtonStyle as ButtonStyle2, ComponentType } from "discord.js";
 import { parseTime as parseTime2 } from "jstools";
+async function awaitConfirm(handler, options) {
+  const __config = options.config || djsConfig;
+  options.timeout = parseTime2(options.timeout || __config.timeouts.CONFIRMATION);
+  if (options.timeout && options.timeout < 1e3) {
+    console.log("[AwaitConfirm]: 'timeout' is less than 1 second. Is this intentional?");
+  }
+  const __embed = options.embed === void 0 ? new BetterEmbed({
+    title: __config.awaitConfirm.DEFAULT_EMBED_TITLE,
+    description: __config.awaitConfirm.DEFAULT_EMBED_DESCRIPTION
+  }) : options.embed === null ? void 0 : options.embed;
+  const buttons = {
+    confirm: new ButtonBuilder2({
+      customId: "btn_confirm",
+      label: "Confirm",
+      style: ButtonStyle2.Success,
+      ...options.buttons?.confirm
+    }),
+    cancel: new ButtonBuilder2({
+      customId: "btn_cancel",
+      label: "Cancel",
+      style: ButtonStyle2.Danger,
+      ...options.buttons?.cancel
+    })
+  };
+  const actionRow = new ActionRowBuilder3({ components: [buttons.confirm, buttons.cancel] });
+  const message = await dynaSend(handler, {
+    sendMethod: options.sendMethod,
+    content: options.content,
+    embeds: __embed,
+    components: actionRow,
+    flags: options.flags,
+    allowedMentions: options.allowedMentions
+  });
+  if (!message) return { message: null, confirmed: false };
+  const cleanUp = async (resolve, confirmed) => {
+    if (confirmed && (options.onResolve?.deleteOnConfirm ?? true)) {
+      if (message?.deletable) await message.delete().catch(Boolean);
+    }
+    if (!confirmed && (options.onResolve?.deleteOnCancel ?? true)) {
+      if (message?.deletable) await message.delete().catch(Boolean);
+    }
+    if ((options.onResolve?.deleteOnConfirm ?? true) || (options.onResolve?.deleteOnCancel ?? true))
+      return resolve(confirmed);
+    if (options.onResolve?.disableComponents) {
+      buttons.cancel.setDisabled(true);
+      buttons.confirm.setDisabled(true);
+      await message?.edit({ components: [actionRow] }).catch(Boolean);
+      return resolve({ message, confirmed });
+    }
+  };
+  const allowedParticipantIds = options.allowedParticipants ? options.allowedParticipants.map((m) => typeof m === "string" ? m : m?.id) : [];
+  return new Promise(async (resolve) => {
+    const executeAction = async (customId) => {
+      switch (customId) {
+        case "btn_confirm":
+          return await cleanUp(resolve, true);
+        case "btn_cancel":
+          return await cleanUp(resolve, false);
+        default:
+          return await cleanUp(resolve, false);
+      }
+    };
+    await message.awaitMessageComponent({
+      filter: (i) => allowedParticipantIds.length ? allowedParticipantIds.includes(i.user.id) && ["btn_confirm", "btn_cancel"].includes(i.customId) : true,
+      componentType: ComponentType.Button,
+      time: options.timeout
+    }).then(async (i) => {
+      await i.deferUpdate().catch(Boolean);
+      executeAction(i.customId);
+    }).catch(() => executeAction("btn_cancel"));
+  });
+}
 
 // src/dTools.ts
+var dTools_exports = {};
+__export(dTools_exports, {
+  __zero: () => __zero,
+  cleanMention: () => cleanMention,
+  fetchChannel: () => fetchChannel,
+  fetchGuild: () => fetchGuild,
+  fetchMember: () => fetchMember,
+  fetchMessage: () => fetchMessage,
+  fetchRole: () => fetchRole,
+  fetchUser: () => fetchUser,
+  getFirstMentionId: () => getFirstMentionId,
+  isMentionOrSnowflake: () => isMentionOrSnowflake
+});
 function __zero(str) {
   return str?.length ? str : "0";
 }
@@ -1187,6 +1475,10 @@ async function fetchMessage(channel, messageId) {
 }
 
 // src/extractMessage.ts
+var extractMessage_exports = {};
+__export(extractMessage_exports, {
+  extractMessage: () => extractMessage
+});
 function extractMessage(message, options) {
   const _options = {
     embedDepth: null,
@@ -1213,6 +1505,24 @@ function extractMessage(message, options) {
   }
   return content.map((str) => (_options.lowercaseify ? str.toLowerCase() : str).trim()).filter((str) => str);
 }
+
+// src/types.ts
+var types_exports = {};
+
+// src/index.ts
+var index_default = {
+  ...AnsiBuilder_exports,
+  ...BetterEmbed_exports,
+  ...CanvasBuilder_exports,
+  ...PageNavigator_exports,
+  ...awaitConfirm_exports,
+  ...config_exports,
+  ...dTools_exports,
+  ...deleteMessageAfter_exports,
+  ...dynaSend_exports,
+  ...extractMessage_exports,
+  ...types_exports
+};
 export {
   ANSIBuilder,
   BetterEmbed,
@@ -1220,6 +1530,7 @@ export {
   __zero,
   cleanMention,
   customDJSConfig,
+  index_default as default,
   deleteMessageAfter,
   djsConfig,
   dynaSend,
