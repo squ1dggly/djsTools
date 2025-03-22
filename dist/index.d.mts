@@ -601,7 +601,7 @@ type MentionType = "users" | "channels" | "roles";
  *
  * Useful for fetching where the provided ID may or may not exist.
  * @param str The string to check. */
-declare function __zero(str?: string | undefined | null): string;
+declare function __zero(str?: string | null): string;
 /** Check if the given string is a mention or a snowflake.
  *
  * Looks for formats like `<@123456789>`, or a numeric string with at least 6 digits.
@@ -620,30 +620,30 @@ declare function getFirstMentionId(options: {
 /** Fetch a user from the client, checking the cache first.
  * @param client - The client to fetch the user from.
  * @param userId - The ID of the user to fetch. */
-declare function fetchUser(client: Client<true>, userId: string): Promise<User | null>;
+declare function fetchUser(client: Client<true>, userId?: string): Promise<User | null>;
 /** Fetch a guild from the client, checking the cache first.
  * @param client - The client to fetch the guild from.
  * @param guildId - The ID of the guild to fetch. */
-declare function fetchGuild(client: Client<true>, guildId: string): Promise<Guild | null>;
+declare function fetchGuild(client: Client<true>, guildId?: string): Promise<Guild | null>;
 /** Fetch a member from a guild, checking the cache first.
  * @param guild - The guild to fetch the member from.
  * @param memberId - The ID of the member to fetch. */
-declare function fetchMember(guild: Guild, memberId: string): Promise<GuildMember | null>;
+declare function fetchMember(guild: Guild, memberId?: string): Promise<GuildMember | null>;
 /** Fetch a channel from a guild, checking the cache first.
  *
  * ***NOTE:*** If the channel type does not match the provided type or the channel is null, null is returned.
  * @param guild - The guild to fetch the channel from.
  * @param channelId - The ID of the channel to fetch.
  * @param type - The type of channel to fetch. */
-declare function fetchChannel<T extends ChannelType>(guild: Guild, channelId: string, type?: T): Promise<FetchedChannel<T> | null>;
+declare function fetchChannel<T extends ChannelType>(guild: Guild, channelId?: string, type?: T): Promise<FetchedChannel<T> | null>;
 /** Fetch a role from a guild, checking the cache first.
  * @param guild - The guild to fetch the role from.
  * @param roleId - The ID of the role to fetch. */
-declare function fetchRole(guild: Guild, roleId: string): Promise<Role | null>;
+declare function fetchRole(guild: Guild, roleId?: string): Promise<Role | null>;
 /** Fetch a message from a channel, checking the cache first.
  * @param channel - The channel to fetch the message from.
  * @param messageId - The ID of the message to fetch. */
-declare function fetchMessage(channel: GuildTextBasedChannel | VoiceBasedChannel, messageId: string): Promise<Message | null>;
+declare function fetchMessage(channel: GuildTextBasedChannel | VoiceBasedChannel, messageId?: string): Promise<Message | null>;
 
 /** Delete a message after a specified amount of time.
  * @param message The message to delete, or a promise resolving to a message.
@@ -679,7 +679,7 @@ declare const _default: {
         forward: discord_js.ForwardOptions;
     })): Promise<discord_js.Message | null>;
     deleteMessageAfter(message: discord_js.Message | Promise<discord_js.Message>, delay?: string | number): Promise<discord_js.Message | null>;
-    __zero(str?: string | undefined | null): string;
+    __zero(str?: string | null): string;
     isMentionOrSnowflake(str: string): boolean;
     cleanMention(str: string): string;
     getFirstMentionId(options: {
@@ -687,12 +687,12 @@ declare const _default: {
         content?: string;
         type: MentionType;
     }): string;
-    fetchUser(client: discord_js.Client<true>, userId: string): Promise<discord_js.User | null>;
-    fetchGuild(client: discord_js.Client<true>, guildId: string): Promise<discord_js.Guild | null>;
-    fetchMember(guild: discord_js.Guild, memberId: string): Promise<discord_js.GuildMember | null>;
-    fetchChannel<T extends discord_js.ChannelType>(guild: discord_js.Guild, channelId: string, type?: T): Promise<FetchedChannel<T> | null>;
-    fetchRole(guild: discord_js.Guild, roleId: string): Promise<discord_js.Role | null>;
-    fetchMessage(channel: discord_js.GuildTextBasedChannel | discord_js.VoiceBasedChannel, messageId: string): Promise<discord_js.Message | null>;
+    fetchUser(client: discord_js.Client<true>, userId?: string): Promise<discord_js.User | null>;
+    fetchGuild(client: discord_js.Client<true>, guildId?: string): Promise<discord_js.Guild | null>;
+    fetchMember(guild: discord_js.Guild, memberId?: string): Promise<discord_js.GuildMember | null>;
+    fetchChannel<T extends discord_js.ChannelType>(guild: discord_js.Guild, channelId?: string, type?: T): Promise<FetchedChannel<T> | null>;
+    fetchRole(guild: discord_js.Guild, roleId?: string): Promise<discord_js.Role | null>;
+    fetchMessage(channel: discord_js.GuildTextBasedChannel | discord_js.VoiceBasedChannel, messageId?: string): Promise<discord_js.Message | null>;
     customDJSConfig(config: jstools.DeepPartial<DJSConfig>): DJSConfig;
     djsConfig: DJSConfig;
     default(handler: SendHandler, options: AwaitConfirmOptions): Promise<{
