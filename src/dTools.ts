@@ -76,21 +76,24 @@ export function getFirstMentionId(options: { message?: Message; content?: string
 /** Fetch a user from the client, checking the cache first.
  * @param client - The client to fetch the user from.
  * @param userId - The ID of the user to fetch. */
-export async function fetchUser(client: Client<true>, userId?: string): Promise<User | null> {
+export async function fetchUser(client: Client<true>, userId: string | undefined | null): Promise<User | null> {
+    if (!userId) return null;
     return client.users.cache.get(__zero(userId)) || (await client.users.fetch(__zero(userId)).catch(() => null));
 }
 
 /** Fetch a guild from the client, checking the cache first.
  * @param client - The client to fetch the guild from.
  * @param guildId - The ID of the guild to fetch. */
-export async function fetchGuild(client: Client<true>, guildId?: string): Promise<Guild | null> {
+export async function fetchGuild(client: Client<true>, guildId: string | undefined | null): Promise<Guild | null> {
+    if (!guildId) return null;
     return client.guilds.cache.get(__zero(guildId)) || (await client.guilds.fetch(__zero(guildId)).catch(() => null));
 }
 
 /** Fetch a member from a guild, checking the cache first.
  * @param guild - The guild to fetch the member from.
  * @param memberId - The ID of the member to fetch. */
-export async function fetchMember(guild: Guild, memberId?: string): Promise<GuildMember | null> {
+export async function fetchMember(guild: Guild, memberId: string | undefined | null): Promise<GuildMember | null> {
+    if (!memberId) return null;
     return guild.members.cache.get(__zero(memberId)) || (await guild.members.fetch(__zero(memberId)).catch(() => null));
 }
 
@@ -102,9 +105,10 @@ export async function fetchMember(guild: Guild, memberId?: string): Promise<Guil
  * @param type - The type of channel to fetch. */
 export async function fetchChannel<T extends ChannelType>(
     guild: Guild,
-    channelId?: string,
+    channelId: string | undefined | null,
     type?: T
 ): Promise<FetchedChannel<T> | null> {
+    if (!channelId) return null;
     const channel =
         guild.channels.cache.get(__zero(channelId)) || (await guild.channels.fetch(__zero(channelId)).catch(() => null));
     if (type && channel?.type !== type) return null;
@@ -114,7 +118,8 @@ export async function fetchChannel<T extends ChannelType>(
 /** Fetch a role from a guild, checking the cache first.
  * @param guild - The guild to fetch the role from.
  * @param roleId - The ID of the role to fetch. */
-export async function fetchRole(guild: Guild, roleId?: string): Promise<Role | null> {
+export async function fetchRole(guild: Guild, roleId: string | undefined | null): Promise<Role | null> {
+    if (!roleId) return null;
     return guild.roles.cache.get(__zero(roleId)) || (await guild.roles.fetch(__zero(roleId)).catch(() => null)) || null;
 }
 
@@ -123,8 +128,9 @@ export async function fetchRole(guild: Guild, roleId?: string): Promise<Role | n
  * @param messageId - The ID of the message to fetch. */
 export async function fetchMessage(
     channel: GuildTextBasedChannel | VoiceBasedChannel,
-    messageId?: string
+    messageId: string | undefined | null
 ): Promise<Message | null> {
+    if (!messageId) return null;
     return (
         channel.messages.cache.get(__zero(messageId)) ||
         (await channel.messages.fetch(__zero(messageId)).catch(() => null)) ||

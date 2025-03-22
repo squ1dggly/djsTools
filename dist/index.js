@@ -1487,23 +1487,29 @@ function getFirstMentionId(options) {
   return mentionId || isMentionOrSnowflake(firstArg) ? cleanMention(firstArg) : "";
 }
 async function fetchUser(client, userId) {
+  if (!userId) return null;
   return client.users.cache.get(__zero(userId)) || await client.users.fetch(__zero(userId)).catch(() => null);
 }
 async function fetchGuild(client, guildId) {
+  if (!guildId) return null;
   return client.guilds.cache.get(__zero(guildId)) || await client.guilds.fetch(__zero(guildId)).catch(() => null);
 }
 async function fetchMember(guild, memberId) {
+  if (!memberId) return null;
   return guild.members.cache.get(__zero(memberId)) || await guild.members.fetch(__zero(memberId)).catch(() => null);
 }
 async function fetchChannel(guild, channelId, type) {
+  if (!channelId) return null;
   const channel = guild.channels.cache.get(__zero(channelId)) || await guild.channels.fetch(__zero(channelId)).catch(() => null);
   if (type && channel?.type !== type) return null;
   return channel;
 }
 async function fetchRole(guild, roleId) {
+  if (!roleId) return null;
   return guild.roles.cache.get(__zero(roleId)) || await guild.roles.fetch(__zero(roleId)).catch(() => null) || null;
 }
 async function fetchMessage(channel, messageId) {
+  if (!messageId) return null;
   return channel.messages.cache.get(__zero(messageId)) || await channel.messages.fetch(__zero(messageId)).catch(() => null) || null;
 }
 
