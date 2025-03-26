@@ -525,14 +525,14 @@ declare class PageNavigator {
     private collect_all;
     private handlePostTimeout;
     constructor(options: PageNavigatorOptions);
-    on(event: "pageChanged", listener: (page: PageData | NestedPageData, index: number) => any, once: boolean): this;
-    on(event: "pageBack", listener: (page: PageData | NestedPageData, index: number) => any, once: boolean): this;
-    on(event: "pageNext", listener: (page: PageData | NestedPageData, index: number) => any, once: boolean): this;
-    on(event: "pageJumped", listener: (page: PageData | NestedPageData, index: number) => any, once: boolean): this;
-    on(event: "selectMenuOptionPicked", listener: (page: PageData | NestedPageData, option: SelectMenuOptionData, index: number) => any, once: boolean): this;
-    on(event: "buttonPressed", listener: (page: PageData | NestedPageData, buttonId: string, user: User | GuildMember) => any, once: boolean): this;
-    on(event: "reaction", listener: (page: PageData | NestedPageData, reaction: MessageReaction, user: User) => any, once: boolean): this;
-    on(event: "timeout", listener: (message: Message) => any, once: boolean): this;
+    on(event: "pageChanged", listener: (page: PageData | NestedPageData, index: number) => any, once?: boolean): this;
+    on(event: "pageBack", listener: (page: PageData | NestedPageData, index: number) => any, once?: boolean): this;
+    on(event: "pageNext", listener: (page: PageData | NestedPageData, index: number) => any, once?: boolean): this;
+    on(event: "pageJumped", listener: (page: PageData | NestedPageData, index: number) => any, once?: boolean): this;
+    on(event: "selectMenuOptionPicked", listener: (page: PageData | NestedPageData, option: SelectMenuOptionData, index: number) => any, once?: boolean): this;
+    on(event: "buttonPressed", listener: (page: PageData | NestedPageData, buttonId: string, user: User | GuildMember) => any, once?: boolean): this;
+    on(event: "reaction", listener: (page: PageData | NestedPageData, reaction: MessageReaction, user: User) => any, once?: boolean): this;
+    on(event: "timeout", listener: (message: Message) => any, once?: boolean): this;
     /** Add one or more options to the select menu component. */
     addSelectMenuOptions(...options: SelectMenuOptionData[]): this;
     /** Remove select menu options at the given index/indices.
