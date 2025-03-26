@@ -1080,7 +1080,7 @@ var PageNavigator = class {
         if (user.id !== reaction.message.guild?.members?.me?.id) await reaction.users.remove(user.id);
         if (allowedParticipantIds.length && !allowedParticipantIds.includes(user.id)) return;
         collector.resetTimer();
-        this.callEventStack("reaction", reaction, user, this.data.page.currentData);
+        this.callEventStack("react", reaction, user, this.data.page.currentData);
         try {
           switch (reaction.emoji.name) {
             case this.options.config.pageNavigator.buttons.to_first.emoji.name:
@@ -1217,7 +1217,7 @@ var PageNavigator = class {
       pageJumped: [],
       selectMenuOptionPicked: [],
       collect: [],
-      reaction: [],
+      react: [],
       timeout: []
     };
     if (!options.pages || Array.isArray(options.pages) && !options.pages.length) {

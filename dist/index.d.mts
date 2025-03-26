@@ -380,7 +380,7 @@ interface ImageOptions {
     };
 }
 
-type PaginationEvent = "pageChanged" | "pageBack" | "pageNext" | "pageJumped" | "selectMenuOptionPicked" | "collect" | "reaction" | "timeout";
+type PaginationEvent = "pageChanged" | "pageBack" | "pageNext" | "pageJumped" | "selectMenuOptionPicked" | "collect" | "react" | "timeout";
 type PaginationType = "short" | "shortJump" | "long" | "longJump";
 type PageResolveable = EmbedResolveable | EmbedResolveable[] | PageData | NestedPageData;
 interface PageNavigatorOptions {
@@ -531,7 +531,7 @@ declare class PageNavigator {
     on(event: "pageJumped", listener: (page: PageData | NestedPageData, index: number) => any, once?: boolean): this;
     on(event: "selectMenuOptionPicked", listener: (page: PageData | NestedPageData, option: SelectMenuOptionData, index: number) => any, once?: boolean): this;
     on<T extends CacheType>(event: "collect", listener: (interaction: StringSelectMenuInteraction<T> | ButtonInteraction<T>, page: PageData | NestedPageData) => any, once?: boolean): this;
-    on(event: "reaction", listener: (reaction: MessageReaction, user: User, page: PageData | NestedPageData) => any, once?: boolean): this;
+    on(event: "react", listener: (reaction: MessageReaction, user: User, page: PageData | NestedPageData) => any, once?: boolean): this;
     on(event: "timeout", listener: (message: Message) => any, once?: boolean): this;
     /** Add one or more options to the select menu component. */
     addSelectMenuOptions(...options: SelectMenuOptionData[]): this;
