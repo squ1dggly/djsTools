@@ -7,8 +7,8 @@ export type PaginationEvent =
     | "pageNext"
     | "pageJumped"
     | "selectMenuOptionPicked"
-    | "buttonPressed"
-    | "reaction"
+    | "collect"
+    | "react"
     | "timeout";
 export type PaginationType = "short" | "shortJump" | "long" | "longJump";
 export type PageResolveable = EmbedResolveable | EmbedResolveable[] | PageData | NestedPageData;
@@ -82,6 +82,7 @@ import {
     ButtonBuilder,
     ButtonInteraction,
     ButtonStyle,
+    CacheType,
     ComponentEmojiResolvable,
     GuildMember,
     InteractionCollector,
@@ -175,8 +176,8 @@ export class PageNavigator {
         pageNext: Array<{ listener: Function; once: boolean }>;
         pageJumped: Array<{ listener: Function; once: boolean }>;
         selectMenuOptionPicked: Array<{ listener: Function; once: boolean }>;
-        buttonPressed: Array<{ listener: Function; once: boolean }>;
-        reaction: Array<{ listener: Function; once: boolean }>;
+        collect: Array<{ listener: Function; once: boolean }>;
+        react: Array<{ listener: Function; once: boolean }>;
         timeout: Array<{ listener: Function; once: boolean }>;
     };
 
@@ -468,9 +469,8 @@ export class PageNavigator {
                 // Reset the collector's timer
                 collector.resetTimer();
 
-                if (i.isButton()) {
-                    this.callEventStack("buttonPressed", this.data.page.currentData, i.customId, i.member || i.user);
-                }
+                // Call the 'collect' event stack
+                this.callEventStack("collect", i, this.data.page.currentData);
 
                 try {
                     switch (i.customId) {
@@ -571,7 +571,8 @@ export class PageNavigator {
                 // Reset the collector's timer
                 collector.resetTimer();
 
-                this.callEventStack("reaction", this.data.page.currentData, reaction, user);
+                // Call the 'reaction' event stack
+                this.callEventStack("react", reaction, user, this.data.page.currentData);
 
                 try {
                     switch (reaction.emoji.name) {
@@ -752,8 +753,8 @@ export class PageNavigator {
             pageNext: [],
             pageJumped: [],
             selectMenuOptionPicked: [],
-            buttonPressed: [],
-            reaction: [],
+            collect: [],
+            react: [],
             timeout: []
         };
 
@@ -783,14 +784,14 @@ export class PageNavigator {
         listener: (page: PageData | NestedPageData, option: SelectMenuOptionData, index: number) => any,
         once?: boolean
     ): this;
-    on(
-        event: "buttonPressed",
-        listener: (page: PageData | NestedPageData, buttonId: string, user: User | GuildMember) => any,
+    on<T extends CacheType>(
+        event: "collect",
+        listener: (interaction: StringSelectMenuInteraction<T> | ButtonInteraction<T>, page: PageData | NestedPageData) => any,
         once?: boolean
     ): this;
     on(
-        event: "reaction",
-        listener: (page: PageData | NestedPageData, reaction: MessageReaction, user: User) => any,
+        event: "react",
+        listener: (reaction: MessageReaction, user: User, page: PageData | NestedPageData) => any,
         once?: boolean
     ): this;
     on(event: "timeout", listener: (message: Message) => any, once?: boolean): this;
