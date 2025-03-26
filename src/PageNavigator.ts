@@ -1,7 +1,15 @@
 import { SendHandler, EmbedResolveable, UserResolvable } from "./types";
 import { DynaSendOptions } from "./dynaSend";
 
-export type PaginationEvent = "pageChanged" | "pageBack" | "pageNext" | "pageJumped" | "selectMenuOptionPicked" | "timeout";
+export type PaginationEvent =
+    | "pageChanged"
+    | "pageBack"
+    | "pageNext"
+    | "pageJumped"
+    | "selectMenuOptionPicked"
+    | "buttonPressed"
+    | "reaction"
+    | "timeout";
 export type PaginationType = "short" | "shortJump" | "long" | "longJump";
 export type PageResolveable = EmbedResolveable | EmbedResolveable[] | PageData | NestedPageData;
 
@@ -78,6 +86,7 @@ import {
     GuildMember,
     InteractionCollector,
     Message,
+    MessageReaction,
     ReactionCollector,
     StringSelectMenuBuilder,
     StringSelectMenuInteraction,
@@ -166,6 +175,8 @@ export class PageNavigator {
         pageNext: Array<{ listener: Function; once: boolean }>;
         pageJumped: Array<{ listener: Function; once: boolean }>;
         selectMenuOptionPicked: Array<{ listener: Function; once: boolean }>;
+        buttonPressed: Array<{ listener: Function; once: boolean }>;
+        reaction: Array<{ listener: Function; once: boolean }>;
         timeout: Array<{ listener: Function; once: boolean }>;
     };
 
@@ -457,6 +468,10 @@ export class PageNavigator {
                 // Reset the collector's timer
                 collector.resetTimer();
 
+                if (i.isButton()) {
+                    this.callEventStack("buttonPressed", this.data.page.currentData, i.customId, i.member || i.user);
+                }
+
                 try {
                     switch (i.customId) {
                         case "ssm_pageSelect":
@@ -555,6 +570,8 @@ export class PageNavigator {
 
                 // Reset the collector's timer
                 collector.resetTimer();
+
+                this.callEventStack("reaction", this.data.page.currentData, reaction, user);
 
                 try {
                     switch (reaction.emoji.name) {
@@ -735,6 +752,8 @@ export class PageNavigator {
             pageNext: [],
             pageJumped: [],
             selectMenuOptionPicked: [],
+            buttonPressed: [],
+            reaction: [],
             timeout: []
         };
 
@@ -762,6 +781,16 @@ export class PageNavigator {
     on(
         event: "selectMenuOptionPicked",
         listener: (page: PageData | NestedPageData, option: SelectMenuOptionData, index: number) => any,
+        once: boolean
+    ): this;
+    on(
+        event: "buttonPressed",
+        listener: (page: PageData | NestedPageData, buttonId: string, user: User | GuildMember) => any,
+        once: boolean
+    ): this;
+    on(
+        event: "reaction",
+        listener: (page: PageData | NestedPageData, reaction: MessageReaction, user: User) => any,
         once: boolean
     ): this;
     on(event: "timeout", listener: (message: Message) => any, once: boolean): this;

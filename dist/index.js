@@ -1034,6 +1034,9 @@ var PageNavigator = class {
       collector.on("collect", async (i) => {
         if (!i.isStringSelectMenu() && !i.isButton()) return;
         collector.resetTimer();
+        if (i.isButton()) {
+          this.callEventStack("buttonPressed", this.data.page.currentData, i.customId, i.member || i.user);
+        }
         try {
           switch (i.customId) {
             case "ssm_pageSelect":
@@ -1110,6 +1113,7 @@ var PageNavigator = class {
         if (user.id !== reaction.message.guild?.members?.me?.id) await reaction.users.remove(user.id);
         if (allowedParticipantIds.length && !allowedParticipantIds.includes(user.id)) return;
         collector.resetTimer();
+        this.callEventStack("reaction", this.data.page.currentData, reaction, user);
         try {
           switch (reaction.emoji.name) {
             case this.options.config.pageNavigator.buttons.to_first.emoji.name:
@@ -1245,6 +1249,8 @@ var PageNavigator = class {
       pageNext: [],
       pageJumped: [],
       selectMenuOptionPicked: [],
+      buttonPressed: [],
+      reaction: [],
       timeout: []
     };
     if (!options.pages || Array.isArray(options.pages) && !options.pages.length) {

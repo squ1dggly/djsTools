@@ -1,7 +1,7 @@
 import * as jstools from 'jstools';
 import { DeepPartial } from 'jstools';
 import * as discord_js from 'discord.js';
-import { CommandInteraction, RepliableInteraction, TextBasedChannel, Message, GuildMember, User, EmbedBuilder, DMChannel, TextChannel, NewsChannel, ThreadChannel, InteractionReplyOptions, ActionRowBuilder, MessageActionRowComponentBuilder, BaseMessageOptions, StickerResolvable, PollData, MessageMentionOptions, ReplyOptions, ForwardOptions, InteractionEditReplyOptions, MessageCreateOptions, MessageReplyOptions, MessageEditOptions, Client, APIEmbedField, ColorResolvable, APIEmbed, StringSelectMenuBuilder, ButtonBuilder, StringSelectMenuOptionBuilder, InteractionCollector, StringSelectMenuInteraction, ButtonInteraction, ReactionCollector, ChannelType, PartialGroupDMChannel, PartialDMChannel, GuildBasedChannel, AnyThreadChannel, VoiceBasedChannel, CategoryChannel, Guild, Role, GuildTextBasedChannel } from 'discord.js';
+import { CommandInteraction, RepliableInteraction, TextBasedChannel, Message, GuildMember, User, EmbedBuilder, DMChannel, TextChannel, NewsChannel, ThreadChannel, InteractionReplyOptions, ActionRowBuilder, MessageActionRowComponentBuilder, BaseMessageOptions, StickerResolvable, PollData, MessageMentionOptions, ReplyOptions, ForwardOptions, InteractionEditReplyOptions, MessageCreateOptions, MessageReplyOptions, MessageEditOptions, Client, APIEmbedField, ColorResolvable, APIEmbed, StringSelectMenuBuilder, ButtonBuilder, StringSelectMenuOptionBuilder, InteractionCollector, StringSelectMenuInteraction, ButtonInteraction, ReactionCollector, MessageReaction, ChannelType, PartialGroupDMChannel, PartialDMChannel, GuildBasedChannel, AnyThreadChannel, VoiceBasedChannel, CategoryChannel, Guild, Role, GuildTextBasedChannel } from 'discord.js';
 import { Image } from '@napi-rs/canvas';
 import { Readable } from 'node:stream';
 
@@ -380,7 +380,7 @@ interface ImageOptions {
     };
 }
 
-type PaginationEvent = "pageChanged" | "pageBack" | "pageNext" | "pageJumped" | "selectMenuOptionPicked" | "timeout";
+type PaginationEvent = "pageChanged" | "pageBack" | "pageNext" | "pageJumped" | "selectMenuOptionPicked" | "buttonPressed" | "reaction" | "timeout";
 type PaginationType = "short" | "shortJump" | "long" | "longJump";
 type PageResolveable = EmbedResolveable | EmbedResolveable[] | PageData | NestedPageData;
 interface PageNavigatorOptions {
@@ -530,6 +530,8 @@ declare class PageNavigator {
     on(event: "pageNext", listener: (page: PageData | NestedPageData, index: number) => any, once: boolean): this;
     on(event: "pageJumped", listener: (page: PageData | NestedPageData, index: number) => any, once: boolean): this;
     on(event: "selectMenuOptionPicked", listener: (page: PageData | NestedPageData, option: SelectMenuOptionData, index: number) => any, once: boolean): this;
+    on(event: "buttonPressed", listener: (page: PageData | NestedPageData, buttonId: string, user: User | GuildMember) => any, once: boolean): this;
+    on(event: "reaction", listener: (page: PageData | NestedPageData, reaction: MessageReaction, user: User) => any, once: boolean): this;
     on(event: "timeout", listener: (message: Message) => any, once: boolean): this;
     /** Add one or more options to the select menu component. */
     addSelectMenuOptions(...options: SelectMenuOptionData[]): this;
