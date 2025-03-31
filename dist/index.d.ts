@@ -625,7 +625,7 @@ declare function cleanMention(str: string | undefined): string | undefined;
  * @param index - The argument index in the content. Default is `0`
  * @param idOnly - Whether to return the ID instead of the fecthed object. */
 declare function getMessageMention<M extends Message, T extends MentionType>(message: M, content: string | undefined | null, type: T, index: number, idOnly: true): Promise<string | null>;
-declare function getMessageMention<M extends Message, T extends MentionType>(message: M, content: string | undefined | null, type: T, index: number, idOnly?: false): Promise<FetchedMessageMention<T, M extends Message<true> ? true : false> | null>;
+declare function getMessageMention<M extends Message, T extends MentionType>(message: M, content: string | undefined | null, type: T, index?: number, idOnly?: false): Promise<FetchedMessageMention<T, M extends Message<true> ? true : false> | null>;
 /** Get the ID of the first mention of a specified type from a message or message content.
  * @param options Optional options that aren't really optional. */
 declare function getFirstMentionId(options: {
@@ -699,7 +699,7 @@ declare const _default: {
     isMentionOrSnowflake(str: string | undefined): boolean;
     cleanMention(str: string | undefined): string | undefined;
     getMessageMention<M extends discord_js.Message, T extends MentionType>(message: M, content: string | undefined | null, type: T, index: number, idOnly: true): Promise<string | null>;
-    getMessageMention<M extends discord_js.Message, T extends MentionType>(message: M, content: string | undefined | null, type: T, index: number, idOnly?: false): Promise<FetchedMessageMention<T, M extends discord_js.Message<true> ? true : false> | null>;
+    getMessageMention<M extends discord_js.Message, T extends MentionType>(message: M, content: string | undefined | null, type: T, index?: number, idOnly?: false): Promise<FetchedMessageMention<T, M extends discord_js.Message<true> ? true : false> | null>;
     getFirstMentionId(options: {
         message?: discord_js.Message;
         content?: string;

@@ -87,7 +87,7 @@ export async function getMessageMention<M extends Message, T extends MentionType
     message: M,
     content: string | undefined | null,
     type: T,
-    index: number,
+    index?: number,
     idOnly?: false
 ): Promise<FetchedMessageMention<T, M extends Message<true> ? true : false> | null>;
 export async function getMessageMention<M extends Message, T extends MentionType>(
