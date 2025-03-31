@@ -10,11 +10,28 @@ export type FetchedChannel<T> = T extends ChannelType.DM
     ? CategoryChannel
     : GuildBasedChannel;
 
-export type MentionType = "users" | "channels" | "roles";
+export type FetchedMessageMention<T extends MentionType, InGuild extends boolean> = T extends "user"
+    ? User
+    : T extends "member"
+    ? GuildMember
+    : T extends "channel"
+    ? InGuild extends true
+        ? GuildBasedChannel
+        : Channel
+    : Role;
+
+export type MentionType = "user" | "member" | "channel" | "role";
+
+export type GetMessageMentionOptions = {
+    cleanContent?: string;
+    /** Return the ID instead of the object. */
+    parse?: boolean;
+};
 
 import {
     AnyThreadChannel,
     CategoryChannel,
+    Channel,
     ChannelType,
     Client,
     DMChannel,
@@ -43,14 +60,88 @@ export function __zero(str?: string | null): string {
  *
  * Looks for formats like `<@123456789>`, or a numeric string with at least 6 digits.
  * @param str The string to check. */
-export function isMentionOrSnowflake(str: string): boolean {
-    return str.match(/<@[#&]?[\d]{6,}>/) || str.match(/\d{6,}/) ? true : false;
+export function isMentionOrSnowflake(str: string | undefined): boolean {
+    return str ? (str.match(/<@[#&]?[\d]{6,}>/) || str.match(/\d{6,}/) ? true : false) : false;
 }
 
 /** Remove mention syntax from a string.
  * @param str The string to clean. */
-export function cleanMention(str: string): string {
-    return str.replaceAll(/[<@#&>]/g, "").trim();
+export function cleanMention(str: string | undefined): string | undefined {
+    return str ? str.replaceAll(/[<@#&>]/g, "").trim() : undefined;
+}
+
+/** Get a mention from a message's content of a specified type.
+ * @param message - The message to parse.
+ * @param type - The type of mention.
+ * @param index - The argument index in the content. Default is `0`
+ * @param parse - Whether to return the ID instead of the fecthed object. */
+export async function getMessageMention<M extends Message, T extends MentionType, P extends boolean>(
+    message: M,
+    type: T,
+    index: number = 0,
+    parse?: P
+): Promise<P extends true ? string | null : FetchedMessageMention<T, M extends Message<true> ? true : false> | null> {
+    switch (type) {
+        case "user":
+            const userMention = message.mentions.users.at(index) || null;
+            return parse ? userMention?.id || null : (userMention as any);
+
+        case "member":
+            if (!message.guild) return null;
+            const member = await fetchMember(message.guild, message.mentions.users.at(index)?.id);
+            return parse ? member?.id || null : (member as any);
+
+        case "channel":
+            const channelMention = message.mentions.channels.at(index) || null;
+            return parse ? channelMention?.id || null : (channelMention as any);
+
+        case "role":
+            const roleMention = message.mentions.roles.at(index) || null;
+            return parse ? roleMention?.id || null : (roleMention as any);
+
+        default:
+            return null;
+    }
+}
+
+/** Get a mention from a message's content of a specified type.
+ * @param context - The context including the client and optional guild for fetching.
+ * @param content - The message content to parse for mention arguments.
+ * @param type - The type of mention.
+ * @param index - The argument index in the content. Default is `0`
+ * @param parse - Whether to return the ID instead of the fecthed object. */
+export async function getMessageMentionArg<G extends Guild | undefined, T extends MentionType, P extends boolean>(
+    context: { client: Client<true>; guild?: G },
+    content: string,
+    type: T,
+    index: number = 0,
+    parse?: P
+): Promise<P extends true ? string | null : FetchedMessageMention<T, G extends Guild ? true : false> | null> {
+    const args = content.split(" ");
+    const arg = isMentionOrSnowflake(args[index]) ? cleanMention(args[index]) : null;
+    if (!arg) return null;
+
+    switch (type) {
+        case "user":
+            return parse ? arg : ((await fetchUser(context.client, arg)) as any);
+
+        case "member":
+            return parse ? arg : ((context.guild ? await fetchMember(context.guild, arg) : null) as any);
+
+        case "channel":
+            return parse
+                ? arg
+                : ((context.guild
+                      ? await fetchChannel(context.guild, arg)
+                      : context.client.channels.cache.get(__zero(arg)) ??
+                        context.client.channels.fetch(__zero(arg))) as any);
+
+        case "role":
+            return parse ? arg : ((context.guild ? await fetchRole(context.guild, arg) : null) as any);
+
+        default:
+            return null;
+    }
 }
 
 /** Get the ID of the first mention of a specified type from a message or message content.
@@ -60,17 +151,17 @@ export function getFirstMentionId(options: { message?: Message; content?: string
 
     if (options.message) {
         switch (options.type) {
-            case "users":
+            case "user":
                 mentionId = options.message.mentions.users.first()?.id || "";
-            case "channels":
+            case "channel":
                 mentionId = options.message.mentions.channels.first()?.id || "";
-            case "roles":
+            case "role":
                 mentionId = options.message.mentions.roles.first()?.id || "";
         }
     }
 
     const firstArg = options.content?.split(" ")[0] || "";
-    return mentionId || isMentionOrSnowflake(firstArg) ? cleanMention(firstArg) : "";
+    return mentionId || isMentionOrSnowflake(firstArg) ? cleanMention(firstArg)! : "";
 }
 
 /** Fetch a user from the client, checking the cache first.

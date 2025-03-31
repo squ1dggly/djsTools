@@ -48,6 +48,8 @@ __export(index_exports, {
   fetchRole: () => fetchRole,
   fetchUser: () => fetchUser,
   getFirstMentionId: () => getFirstMentionId,
+  getMessageMention: () => getMessageMention,
+  getMessageMentionArg: () => getMessageMentionArg,
   isMentionOrSnowflake: () => isMentionOrSnowflake
 });
 module.exports = __toCommonJS(index_exports);
@@ -1464,26 +1466,64 @@ __export(dTools_exports, {
   fetchRole: () => fetchRole,
   fetchUser: () => fetchUser,
   getFirstMentionId: () => getFirstMentionId,
+  getMessageMention: () => getMessageMention,
+  getMessageMentionArg: () => getMessageMentionArg,
   isMentionOrSnowflake: () => isMentionOrSnowflake
 });
 function __zero(str) {
   return str?.length ? str : "0";
 }
 function isMentionOrSnowflake(str) {
-  return str.match(/<@[#&]?[\d]{6,}>/) || str.match(/\d{6,}/) ? true : false;
+  return str ? str.match(/<@[#&]?[\d]{6,}>/) || str.match(/\d{6,}/) ? true : false : false;
 }
 function cleanMention(str) {
-  return str.replaceAll(/[<@#&>]/g, "").trim();
+  return str ? str.replaceAll(/[<@#&>]/g, "").trim() : void 0;
+}
+async function getMessageMention(message, type, index = 0, parse) {
+  switch (type) {
+    case "user":
+      const userMention = message.mentions.users.at(index) || null;
+      return parse ? userMention?.id || null : userMention;
+    case "member":
+      if (!message.guild) return null;
+      const member = await fetchMember(message.guild, message.mentions.users.at(index)?.id);
+      return parse ? member?.id || null : member;
+    case "channel":
+      const channelMention = message.mentions.channels.at(index) || null;
+      return parse ? channelMention?.id || null : channelMention;
+    case "role":
+      const roleMention = message.mentions.roles.at(index) || null;
+      return parse ? roleMention?.id || null : roleMention;
+    default:
+      return null;
+  }
+}
+async function getMessageMentionArg(context, content, type, index = 0, parse) {
+  const args = content.split(" ");
+  const arg = isMentionOrSnowflake(args[index]) ? cleanMention(args[index]) : null;
+  if (!arg) return null;
+  switch (type) {
+    case "user":
+      return parse ? arg : await fetchUser(context.client, arg);
+    case "member":
+      return parse ? arg : context.guild ? await fetchMember(context.guild, arg) : null;
+    case "channel":
+      return parse ? arg : context.guild ? await fetchChannel(context.guild, arg) : context.client.channels.cache.get(__zero(arg)) ?? context.client.channels.fetch(__zero(arg));
+    case "role":
+      return parse ? arg : context.guild ? await fetchRole(context.guild, arg) : null;
+    default:
+      return null;
+  }
 }
 function getFirstMentionId(options) {
   let mentionId = "";
   if (options.message) {
     switch (options.type) {
-      case "users":
+      case "user":
         mentionId = options.message.mentions.users.first()?.id || "";
-      case "channels":
+      case "channel":
         mentionId = options.message.mentions.channels.first()?.id || "";
-      case "roles":
+      case "role":
         mentionId = options.message.mentions.roles.first()?.id || "";
     }
   }
@@ -1585,5 +1625,7 @@ var index_default = {
   fetchRole,
   fetchUser,
   getFirstMentionId,
+  getMessageMention,
+  getMessageMentionArg,
   isMentionOrSnowflake
 });

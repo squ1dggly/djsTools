@@ -1,7 +1,7 @@
 import * as jstools from 'jstools';
 import { DeepPartial } from 'jstools';
 import * as discord_js from 'discord.js';
-import { CommandInteraction, RepliableInteraction, TextBasedChannel, Message, GuildMember, User, EmbedBuilder, DMChannel, TextChannel, NewsChannel, ThreadChannel, InteractionReplyOptions, ActionRowBuilder, MessageActionRowComponentBuilder, BaseMessageOptions, StickerResolvable, PollData, MessageMentionOptions, ReplyOptions, ForwardOptions, InteractionEditReplyOptions, MessageCreateOptions, MessageReplyOptions, MessageEditOptions, Client, APIEmbedField, ColorResolvable, APIEmbed, StringSelectMenuBuilder, ButtonBuilder, StringSelectMenuOptionBuilder, InteractionCollector, StringSelectMenuInteraction, ButtonInteraction, ReactionCollector, CacheType, MessageReaction, ChannelType, PartialGroupDMChannel, PartialDMChannel, GuildBasedChannel, AnyThreadChannel, VoiceBasedChannel, CategoryChannel, Guild, Role, GuildTextBasedChannel } from 'discord.js';
+import { CommandInteraction, RepliableInteraction, TextBasedChannel, Message, GuildMember, User, EmbedBuilder, DMChannel, TextChannel, NewsChannel, ThreadChannel, InteractionReplyOptions, ActionRowBuilder, MessageActionRowComponentBuilder, BaseMessageOptions, StickerResolvable, PollData, MessageMentionOptions, ReplyOptions, ForwardOptions, InteractionEditReplyOptions, MessageCreateOptions, MessageReplyOptions, MessageEditOptions, Client, APIEmbedField, ColorResolvable, APIEmbed, StringSelectMenuBuilder, ButtonBuilder, StringSelectMenuOptionBuilder, InteractionCollector, StringSelectMenuInteraction, ButtonInteraction, ReactionCollector, CacheType, MessageReaction, GuildBasedChannel, Channel, Role, ChannelType, PartialGroupDMChannel, PartialDMChannel, AnyThreadChannel, VoiceBasedChannel, CategoryChannel, Guild, GuildTextBasedChannel } from 'discord.js';
 import { Image } from '@napi-rs/canvas';
 import { Readable } from 'node:stream';
 
@@ -597,7 +597,13 @@ interface AwaitConfirmOptions extends Omit<DynaSendOptions, "embeds" | "componen
 }
 
 type FetchedChannel<T> = T extends ChannelType.DM ? PartialGroupDMChannel | DMChannel | PartialDMChannel : T extends ChannelType.GuildText ? GuildBasedChannel & TextBasedChannel : T extends ChannelType.PublicThread | ChannelType.PrivateThread | ChannelType.AnnouncementThread ? AnyThreadChannel : T extends ChannelType.GuildVoice ? VoiceBasedChannel : T extends ChannelType.GuildCategory ? CategoryChannel : GuildBasedChannel;
-type MentionType = "users" | "channels" | "roles";
+type FetchedMessageMention<T extends MentionType, InGuild extends boolean> = T extends "user" ? User : T extends "member" ? GuildMember : T extends "channel" ? InGuild extends true ? GuildBasedChannel : Channel : Role;
+type MentionType = "user" | "member" | "channel" | "role";
+type GetMessageMentionOptions = {
+    cleanContent?: string;
+    /** Return the ID instead of the object. */
+    parse?: boolean;
+};
 
 /** Returns the string if it's populated, or "0" otherwise.
  *
@@ -608,10 +614,26 @@ declare function __zero(str?: string | null): string;
  *
  * Looks for formats like `<@123456789>`, or a numeric string with at least 6 digits.
  * @param str The string to check. */
-declare function isMentionOrSnowflake(str: string): boolean;
+declare function isMentionOrSnowflake(str: string | undefined): boolean;
 /** Remove mention syntax from a string.
  * @param str The string to clean. */
-declare function cleanMention(str: string): string;
+declare function cleanMention(str: string | undefined): string | undefined;
+/** Get a mention from a message's content of a specified type.
+ * @param message - The message to parse.
+ * @param type - The type of mention.
+ * @param index - The argument index in the content. Default is `0`
+ * @param parse - Whether to return the ID instead of the fecthed object. */
+declare function getMessageMention<M extends Message, T extends MentionType, P extends boolean>(message: M, type: T, index?: number, parse?: P): Promise<P extends true ? string | null : FetchedMessageMention<T, M extends Message<true> ? true : false> | null>;
+/** Get a mention from a message's content of a specified type.
+ * @param context - The context including the client and optional guild for fetching.
+ * @param content - The message content to parse for mention arguments.
+ * @param type - The type of mention.
+ * @param index - The argument index in the content. Default is `0`
+ * @param parse - Whether to return the ID instead of the fecthed object. */
+declare function getMessageMentionArg<G extends Guild | undefined, T extends MentionType, P extends boolean>(context: {
+    client: Client<true>;
+    guild?: G;
+}, content: string, type: T, index?: number, parse?: P): Promise<P extends true ? string | null : FetchedMessageMention<T, G extends Guild ? true : false> | null>;
 /** Get the ID of the first mention of a specified type from a message or message content.
  * @param options Optional options that aren't really optional. */
 declare function getFirstMentionId(options: {
@@ -682,8 +704,13 @@ declare const _default: {
     })): Promise<discord_js.Message | null>;
     deleteMessageAfter(message: discord_js.Message | Promise<discord_js.Message>, delay?: string | number): Promise<discord_js.Message | null>;
     __zero(str?: string | null): string;
-    isMentionOrSnowflake(str: string): boolean;
-    cleanMention(str: string): string;
+    isMentionOrSnowflake(str: string | undefined): boolean;
+    cleanMention(str: string | undefined): string | undefined;
+    getMessageMention<M extends discord_js.Message, T extends MentionType, P extends boolean>(message: M, type: T, index?: number, parse?: P): Promise<P extends true ? string | null : FetchedMessageMention<T, M extends discord_js.Message<true> ? true : false> | null>;
+    getMessageMentionArg<G extends discord_js.Guild | undefined, T extends MentionType, P extends boolean>(context: {
+        client: discord_js.Client<true>;
+        guild?: G;
+    }, content: string, type: T, index?: number, parse?: P): Promise<P extends true ? string | null : FetchedMessageMention<T, G extends discord_js.Guild ? true : false> | null>;
     getFirstMentionId(options: {
         message?: discord_js.Message;
         content?: string;
@@ -706,4 +733,4 @@ declare const _default: {
     ANSIBuilder: typeof ANSIBuilder;
 };
 
-export { type ANSIBGColor, ANSIBuilder, type ANSIFormat, type ANSITextColor, type ANSITextOptions, type AwaitConfirmOptions, BetterEmbed, type BetterEmbedAuthor, type BetterEmbedData, type BetterEmbedFooter, type BetterEmbedTitle, type CanvasOptions, type ColorHex, type DJSConfig, type DynaSendData, type DynaSendOptions, type EmbedResolveable, type ExtractionOptions, type FetchedChannel, type ImageOptions, type ImageResolveable, type InteractionBasedSendHandler, type InteractionResolveable, type MentionType, type MimeType, type NestedPageData, type PageData, PageNavigator, type PageNavigatorOptions, type PageResolveable, type PaginationEvent, type PaginationType, type SelectMenuOptionData, type SendHandler, type SendMethod, type SendMethodChannelBased, type SendMethodInteractionBased, type SendMethodMessageBased, type SendMethodUserBased, type SendOptions, type SendableTextChannel, type TextOptions, type UserResolvable, __zero, cleanMention, customDJSConfig, _default as default, deleteMessageAfter, djsConfig, dynaSend, extractMessage, fetchChannel, fetchGuild, fetchMember, fetchMessage, fetchRole, fetchUser, getFirstMentionId, isMentionOrSnowflake };
+export { type ANSIBGColor, ANSIBuilder, type ANSIFormat, type ANSITextColor, type ANSITextOptions, type AwaitConfirmOptions, BetterEmbed, type BetterEmbedAuthor, type BetterEmbedData, type BetterEmbedFooter, type BetterEmbedTitle, type CanvasOptions, type ColorHex, type DJSConfig, type DynaSendData, type DynaSendOptions, type EmbedResolveable, type ExtractionOptions, type FetchedChannel, type FetchedMessageMention, type GetMessageMentionOptions, type ImageOptions, type ImageResolveable, type InteractionBasedSendHandler, type InteractionResolveable, type MentionType, type MimeType, type NestedPageData, type PageData, PageNavigator, type PageNavigatorOptions, type PageResolveable, type PaginationEvent, type PaginationType, type SelectMenuOptionData, type SendHandler, type SendMethod, type SendMethodChannelBased, type SendMethodInteractionBased, type SendMethodMessageBased, type SendMethodUserBased, type SendOptions, type SendableTextChannel, type TextOptions, type UserResolvable, __zero, cleanMention, customDJSConfig, _default as default, deleteMessageAfter, djsConfig, dynaSend, extractMessage, fetchChannel, fetchGuild, fetchMember, fetchMessage, fetchRole, fetchUser, getFirstMentionId, getMessageMention, getMessageMentionArg, isMentionOrSnowflake };
