@@ -70,74 +70,70 @@ export function cleanMention(str: string | undefined): string | undefined {
     return str ? str.replaceAll(/[<@#&>]/g, "").trim() : undefined;
 }
 
-/** Get a mention from a message's content of a specified type.
+/** Get a mention or snowflake argument of a specified type from a message.
  * @param message - The message to parse.
+ * @param content - The message's clean content to parse. Will be used if message.mentions isn't populated.
  * @param type - The type of mention.
  * @param index - The argument index in the content. Default is `0`
- * @param parse - Whether to return the ID instead of the fecthed object. */
-export async function getMessageMention<M extends Message, T extends MentionType, P extends boolean>(
+ * @param idOnly - Whether to return the ID instead of the fecthed object. */
+export async function getMessageMention<M extends Message, T extends MentionType>(
     message: M,
+    content: string | undefined | null,
+    type: T,
+    index: number,
+    idOnly: true
+): Promise<string | null>;
+export async function getMessageMention<M extends Message, T extends MentionType>(
+    message: M,
+    content: string | undefined | null,
+    type: T,
+    index: number,
+    idOnly?: false
+): Promise<FetchedMessageMention<T, M extends Message<true> ? true : false> | null>;
+export async function getMessageMention<M extends Message, T extends MentionType>(
+    message: M,
+    content: string | undefined | null,
     type: T,
     index: number = 0,
-    parse?: P
-): Promise<P extends true ? string | null : FetchedMessageMention<T, M extends Message<true> ? true : false> | null> {
+    idOnly?: boolean
+) {
+    const args = content?.split(" ");
+    const arg = isMentionOrSnowflake(args?.[index]) ? cleanMention(args?.[index]) : undefined;
+
     switch (type) {
         case "user":
             const userMention = message.mentions.users.at(index) || null;
-            return parse ? userMention?.id || null : (userMention as any);
+            if (!userMention && arg) {
+                return idOnly ? arg : ((await fetchUser(message.client, arg)) as any);
+            } else {
+                return idOnly ? userMention?.id || null : (userMention as any);
+            }
 
         case "member":
             if (!message.guild) return null;
-            const member = await fetchMember(message.guild, message.mentions.users.at(index)?.id);
-            return parse ? member?.id || null : (member as any);
+            const member = await fetchMember(message.guild, message.mentions.users.at(index)?.id ?? arg);
+            return idOnly ? member?.id || null : (member as any);
 
         case "channel":
             const channelMention = message.mentions.channels.at(index) || null;
-            return parse ? channelMention?.id || null : (channelMention as any);
+            if (!channelMention && arg) {
+                return idOnly
+                    ? arg
+                    : ((message.guild
+                          ? await fetchChannel(message.guild, arg)
+                          : message.client.channels.cache.get(__zero(arg)) ??
+                            message.client.channels.fetch(__zero(arg))) as any);
+            } else {
+                return idOnly ? channelMention?.id || null : (channelMention as any);
+            }
 
         case "role":
             const roleMention = message.mentions.roles.at(index) || null;
-            return parse ? roleMention?.id || null : (roleMention as any);
-
-        default:
-            return null;
-    }
-}
-
-/** Get a mention from a message's content of a specified type.
- * @param context - The context including the client and optional guild for fetching.
- * @param content - The message content to parse for mention arguments.
- * @param type - The type of mention.
- * @param index - The argument index in the content. Default is `0`
- * @param parse - Whether to return the ID instead of the fecthed object. */
-export async function getMessageMentionArg<G extends Guild | undefined, T extends MentionType, P extends boolean>(
-    context: { client: Client<true>; guild?: G },
-    content: string,
-    type: T,
-    index: number = 0,
-    parse?: P
-): Promise<P extends true ? string | null : FetchedMessageMention<T, G extends Guild ? true : false> | null> {
-    const args = content.split(" ");
-    const arg = isMentionOrSnowflake(args[index]) ? cleanMention(args[index]) : null;
-    if (!arg) return null;
-
-    switch (type) {
-        case "user":
-            return parse ? arg : ((await fetchUser(context.client, arg)) as any);
-
-        case "member":
-            return parse ? arg : ((context.guild ? await fetchMember(context.guild, arg) : null) as any);
-
-        case "channel":
-            return parse
-                ? arg
-                : ((context.guild
-                      ? await fetchChannel(context.guild, arg)
-                      : context.client.channels.cache.get(__zero(arg)) ??
-                        context.client.channels.fetch(__zero(arg))) as any);
-
-        case "role":
-            return parse ? arg : ((context.guild ? await fetchRole(context.guild, arg) : null) as any);
+            if (!roleMention && arg) {
+                return idOnly ? arg : message.guild ? ((await fetchRole(message.guild, arg)) as any) : null;
+            } else {
+                return idOnly ? roleMention?.id || null : (roleMention as any);
+            }
 
         default:
             return null;

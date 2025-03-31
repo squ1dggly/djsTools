@@ -1434,7 +1434,6 @@ __export(dTools_exports, {
   fetchUser: () => fetchUser,
   getFirstMentionId: () => getFirstMentionId,
   getMessageMention: () => getMessageMention,
-  getMessageMentionArg: () => getMessageMentionArg,
   isMentionOrSnowflake: () => isMentionOrSnowflake
 });
 function __zero(str) {
@@ -1446,38 +1445,35 @@ function isMentionOrSnowflake(str) {
 function cleanMention(str) {
   return str ? str.replaceAll(/[<@#&>]/g, "").trim() : void 0;
 }
-async function getMessageMention(message, type, index = 0, parse) {
+async function getMessageMention(message, content, type, index = 0, idOnly) {
+  const args = content?.split(" ");
+  const arg = isMentionOrSnowflake(args?.[index]) ? cleanMention(args?.[index]) : void 0;
   switch (type) {
     case "user":
       const userMention = message.mentions.users.at(index) || null;
-      return parse ? userMention?.id || null : userMention;
+      if (!userMention && arg) {
+        return idOnly ? arg : await fetchUser(message.client, arg);
+      } else {
+        return idOnly ? userMention?.id || null : userMention;
+      }
     case "member":
       if (!message.guild) return null;
-      const member = await fetchMember(message.guild, message.mentions.users.at(index)?.id);
-      return parse ? member?.id || null : member;
+      const member = await fetchMember(message.guild, message.mentions.users.at(index)?.id ?? arg);
+      return idOnly ? member?.id || null : member;
     case "channel":
       const channelMention = message.mentions.channels.at(index) || null;
-      return parse ? channelMention?.id || null : channelMention;
+      if (!channelMention && arg) {
+        return idOnly ? arg : message.guild ? await fetchChannel(message.guild, arg) : message.client.channels.cache.get(__zero(arg)) ?? message.client.channels.fetch(__zero(arg));
+      } else {
+        return idOnly ? channelMention?.id || null : channelMention;
+      }
     case "role":
       const roleMention = message.mentions.roles.at(index) || null;
-      return parse ? roleMention?.id || null : roleMention;
-    default:
-      return null;
-  }
-}
-async function getMessageMentionArg(context, content, type, index = 0, parse) {
-  const args = content.split(" ");
-  const arg = isMentionOrSnowflake(args[index]) ? cleanMention(args[index]) : null;
-  if (!arg) return null;
-  switch (type) {
-    case "user":
-      return parse ? arg : await fetchUser(context.client, arg);
-    case "member":
-      return parse ? arg : context.guild ? await fetchMember(context.guild, arg) : null;
-    case "channel":
-      return parse ? arg : context.guild ? await fetchChannel(context.guild, arg) : context.client.channels.cache.get(__zero(arg)) ?? context.client.channels.fetch(__zero(arg));
-    case "role":
-      return parse ? arg : context.guild ? await fetchRole(context.guild, arg) : null;
+      if (!roleMention && arg) {
+        return idOnly ? arg : message.guild ? await fetchRole(message.guild, arg) : null;
+      } else {
+        return idOnly ? roleMention?.id || null : roleMention;
+      }
     default:
       return null;
   }
@@ -1593,6 +1589,5 @@ export {
   fetchUser,
   getFirstMentionId,
   getMessageMention,
-  getMessageMentionArg,
   isMentionOrSnowflake
 };
