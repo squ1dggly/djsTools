@@ -12,13 +12,13 @@
     "author": "xsqu1znt",
     "license": "MIT",
     "devDependencies": {
-        "@types/node": "^22.13.4",
-        "tsup": "^8.3.6",
-        "typescript": "^5.7.3"
+        "@types/node": "^22.15.3",
+        "tsup": "^8.4.0",
+        "typescript": "^5.8.3"
     },
     "dependencies": {
-        "@napi-rs/canvas": "^0.1.67",
-        "discord.js": "^14.18.0",
-        "jstools": "github:squ1dggly/jsTools"
+        "@napi-rs/canvas": "^0.1.70",
+        "discord.js": "^14.19.3",
+        "jstools": "github:xsqu1znt/jsTools"
     }
 }
