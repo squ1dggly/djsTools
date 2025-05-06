@@ -2,7 +2,7 @@ import * as jstools from 'jstools';
 import { DeepPartial } from 'jstools';
 import * as discord_js from 'discord.js';
 import { CommandInteraction, RepliableInteraction, TextBasedChannel, Message, GuildMember, User, EmbedBuilder, DMChannel, TextChannel, NewsChannel, ThreadChannel, InteractionReplyOptions, ActionRowBuilder, MessageActionRowComponentBuilder, BaseMessageOptions, StickerResolvable, PollData, MessageMentionOptions, ReplyOptions, ForwardOptions, InteractionEditReplyOptions, MessageCreateOptions, MessageReplyOptions, MessageEditOptions, Client, APIEmbedField, ColorResolvable, APIEmbed, StringSelectMenuBuilder, ButtonBuilder, StringSelectMenuOptionBuilder, InteractionCollector, StringSelectMenuInteraction, ButtonInteraction, ReactionCollector, CacheType, MessageReaction, GuildBasedChannel, Channel, Role, ChannelType, PartialGroupDMChannel, PartialDMChannel, AnyThreadChannel, VoiceBasedChannel, CategoryChannel, Guild, GuildTextBasedChannel } from 'discord.js';
-import { Image } from '@napi-rs/canvas';
+import { Canvas, SKRSContext2D, Image, AvifConfig } from '@napi-rs/canvas';
 import { Readable } from 'node:stream';
 
 interface DJSConfig {
@@ -379,6 +379,31 @@ interface ImageOptions {
         height: number;
     };
 }
+declare class CanvasBuilder {
+    width: number;
+    height: number;
+    canvas: Canvas;
+    ctx: SKRSContext2D;
+    options: CanvasOptions;
+    constructor(width: number, height: number, options?: Partial<CanvasOptions>);
+    private tempCanvas;
+    private loadImage;
+    /** Load a font from the specified path and assign it to an alias.
+     * Returns whether the font was loaded successfully.
+     * @param path Path to the font file.
+     * @param alias The alias to assign to the font.
+     * @param relative Whether the path is relative to `process.cwd()`. */
+    loadFont(path: string, alias: string, relative?: boolean): boolean;
+    measureText(text: string): TextMetrics;
+    clear(x?: number, y?: number, width?: number, height?: number): void;
+    setBackgroundColor(color?: ColorHex): void;
+    setBackgroundImage(source: ImageResolveable): Promise<void>;
+    fillText(text: string, options?: Partial<TextOptions>): void;
+    drawImage(source: ImageResolveable, options?: Partial<ImageOptions>): Promise<void>;
+    toBuffer(mime: "image/png"): Buffer;
+    toBuffer(mime: "image/avif", cfg?: AvifConfig): Buffer;
+    toBuffer(mime: "image/jpeg" | "image/webp", quality?: number): Buffer;
+}
 
 type PaginationEvent = "pageChanged" | "pageBack" | "pageNext" | "pageJumped" | "selectMenuOptionPicked" | "collect" | "react" | "timeout";
 type PaginationType = "short" | "shortJump" | "long" | "longJump";
@@ -718,8 +743,9 @@ declare const _default: {
         confirmed: boolean;
     }>;
     PageNavigator: typeof PageNavigator;
+    CanvasBuilder: typeof CanvasBuilder;
     BetterEmbed: typeof BetterEmbed;
     ANSIBuilder: typeof ANSIBuilder;
 };
 
-export { type ANSIBGColor, ANSIBuilder, type ANSIFormat, type ANSITextColor, type ANSITextOptions, type AwaitConfirmOptions, BetterEmbed, type BetterEmbedAuthor, type BetterEmbedData, type BetterEmbedFooter, type BetterEmbedTitle, type CanvasOptions, type ColorHex, type DJSConfig, type DynaSendData, type DynaSendOptions, type EmbedResolveable, type ExtractionOptions, type FetchedChannel, type FetchedMessageMention, type GetMessageMentionOptions, type ImageOptions, type ImageResolveable, type InteractionBasedSendHandler, type InteractionResolveable, type MentionType, type MimeType, type NestedPageData, type PageData, PageNavigator, type PageNavigatorOptions, type PageResolveable, type PaginationEvent, type PaginationType, type SelectMenuOptionData, type SendHandler, type SendMethod, type SendMethodChannelBased, type SendMethodInteractionBased, type SendMethodMessageBased, type SendMethodUserBased, type SendOptions, type SendableTextChannel, type TextOptions, type UserResolvable, __zero, cleanMention, customDJSConfig, _default as default, deleteMessageAfter, djsConfig, dynaSend, extractMessage, fetchChannel, fetchGuild, fetchMember, fetchMessage, fetchRole, fetchUser, getFirstMentionId, getMessageMention, isMentionOrSnowflake };
+export { type ANSIBGColor, ANSIBuilder, type ANSIFormat, type ANSITextColor, type ANSITextOptions, type AwaitConfirmOptions, BetterEmbed, type BetterEmbedAuthor, type BetterEmbedData, type BetterEmbedFooter, type BetterEmbedTitle, CanvasBuilder, type CanvasOptions, type ColorHex, type DJSConfig, type DynaSendData, type DynaSendOptions, type EmbedResolveable, type ExtractionOptions, type FetchedChannel, type FetchedMessageMention, type GetMessageMentionOptions, type ImageOptions, type ImageResolveable, type InteractionBasedSendHandler, type InteractionResolveable, type MentionType, type MimeType, type NestedPageData, type PageData, PageNavigator, type PageNavigatorOptions, type PageResolveable, type PaginationEvent, type PaginationType, type SelectMenuOptionData, type SendHandler, type SendMethod, type SendMethodChannelBased, type SendMethodInteractionBased, type SendMethodMessageBased, type SendMethodUserBased, type SendOptions, type SendableTextChannel, type TextOptions, type UserResolvable, __zero, cleanMention, customDJSConfig, _default as default, deleteMessageAfter, djsConfig, dynaSend, extractMessage, fetchChannel, fetchGuild, fetchMember, fetchMessage, fetchRole, fetchUser, getFirstMentionId, getMessageMention, isMentionOrSnowflake };

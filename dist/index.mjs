@@ -645,7 +645,7 @@ var BetterEmbed = class _BetterEmbed {
 // src/CanvasBuilder.ts
 var CanvasBuilder_exports = {};
 __export(CanvasBuilder_exports, {
-  default: () => CanvasBuilder
+  CanvasBuilder: () => CanvasBuilder
 });
 import { createCanvas, GlobalFonts, loadImage } from "@napi-rs/canvas";
 import { join } from "node:path";
@@ -1572,6 +1572,7 @@ var index_default = {
 export {
   ANSIBuilder,
   BetterEmbed,
+  CanvasBuilder,
   PageNavigator,
   __zero,
   cleanMention,

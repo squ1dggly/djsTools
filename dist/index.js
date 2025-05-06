@@ -32,6 +32,7 @@ var index_exports = {};
 __export(index_exports, {
   ANSIBuilder: () => ANSIBuilder,
   BetterEmbed: () => BetterEmbed,
+  CanvasBuilder: () => CanvasBuilder,
   PageNavigator: () => PageNavigator,
   __zero: () => __zero,
   cleanMention: () => cleanMention,
@@ -683,7 +684,7 @@ var BetterEmbed = class _BetterEmbed {
 // src/CanvasBuilder.ts
 var CanvasBuilder_exports = {};
 __export(CanvasBuilder_exports, {
-  default: () => CanvasBuilder
+  CanvasBuilder: () => CanvasBuilder
 });
 var import_canvas = require("@napi-rs/canvas");
 var import_node_path = require("path");
@@ -1605,6 +1606,7 @@ var index_default = {
 0 && (module.exports = {
   ANSIBuilder,
   BetterEmbed,
+  CanvasBuilder,
   PageNavigator,
   __zero,
   cleanMention,

@@ -38,7 +38,7 @@ export interface ImageOptions {
 
 const imageCache: Map<string, Image> = new Map();
 
-export default class CanvasBuilder {
+export class CanvasBuilder {
     canvas: Canvas;
     ctx: SKRSContext2D;
 
