@@ -786,7 +786,10 @@ export class PageNavigator {
     ): this;
     on<T extends CacheType>(
         event: "collect",
-        listener: (interaction: StringSelectMenuInteraction<T> | ButtonInteraction<T>, page: PageData | NestedPageData) => any,
+        listener: (
+            interaction: StringSelectMenuInteraction<T> | ButtonInteraction<T>,
+            page: PageData | NestedPageData
+        ) => any,
         once?: boolean
     ): this;
     on(

@@ -310,21 +310,19 @@ async function dynaSend(handler, options) {
         console.error("[DYNASEND]", "REPLY_TO_INTERACTION | SendMethod: 'reply'", err);
         return null;
       });
-      message = isInteractionCallback(_reply) ? _reply.resource?.message || null : null;
+      message = isInteractionCallback(_reply) ? _reply.resource?.message ?? null : null;
       break;
     case "editReply":
-      const _editReply = await handler.editReply(createSendData(options, "editReply")).catch((err) => {
+      message = await handler.editReply(createSendData(options, "editReply")).catch((err) => {
         console.error("[DYNASEND]", "REPLY_TO_INTERACTION | SendMethod: 'reply'", err);
         return null;
       });
-      message = isInteractionCallback(_editReply) ? _editReply.resource?.message || null : null;
       break;
     case "followUp":
-      const _followUp = await handler.followUp(createSendData(options, "followUp")).catch((err) => {
+      message = await handler.followUp(createSendData(options, "followUp")).catch((err) => {
         console.error("[DYNASEND]", "REPLY_TO_INTERACTION | SendMethod: 'reply'", err);
         return null;
       });
-      message = isInteractionCallback(_followUp) ? _followUp.resource?.message || null : null;
       break;
     case "sendInChannel":
       message = await handler.send(createSendData(options, "sendInChannel")).catch((err) => {

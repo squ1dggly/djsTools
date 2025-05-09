@@ -261,27 +261,21 @@ export async function dynaSend(handler: SendHandler, options: RequiredDynaSendOp
                 console.error("[DYNASEND]", "REPLY_TO_INTERACTION | SendMethod: 'reply'", err);
                 return null;
             });
-            message = isInteractionCallback(_reply) ? _reply.resource?.message || null : null;
+            message = isInteractionCallback(_reply) ? _reply.resource?.message ?? null : null;
             break;
 
         case "editReply":
-            const _editReply = await (handler as RepliableInteraction)
-                .editReply(createSendData(options, "editReply"))
-                .catch(err => {
-                    console.error("[DYNASEND]", "REPLY_TO_INTERACTION | SendMethod: 'reply'", err);
-                    return null;
-                });
-            message = isInteractionCallback(_editReply) ? _editReply.resource?.message || null : null;
+            message = await (handler as RepliableInteraction).editReply(createSendData(options, "editReply")).catch(err => {
+                console.error("[DYNASEND]", "REPLY_TO_INTERACTION | SendMethod: 'reply'", err);
+                return null;
+            });
             break;
 
         case "followUp":
-            const _followUp = await (handler as RepliableInteraction)
-                .followUp(createSendData(options, "followUp"))
-                .catch(err => {
-                    console.error("[DYNASEND]", "REPLY_TO_INTERACTION | SendMethod: 'reply'", err);
-                    return null;
-                });
-            message = isInteractionCallback(_followUp) ? _followUp.resource?.message || null : null;
+            message = await (handler as RepliableInteraction).followUp(createSendData(options, "followUp")).catch(err => {
+                console.error("[DYNASEND]", "REPLY_TO_INTERACTION | SendMethod: 'reply'", err);
+                return null;
+            });
             break;
 
         case "sendInChannel":
