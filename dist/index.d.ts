@@ -621,6 +621,14 @@ interface AwaitConfirmOptions extends Omit<DynaSendOptions, "embeds" | "componen
     config?: DJSConfig;
 }
 
+/** Send a confirmation message and await the user's response.
+
+ * This function utilizes {@link BetterEmbed} and {@link dynaSend}. */
+declare function awaitConfirm(handler: SendHandler, options: AwaitConfirmOptions): Promise<{
+    message: Message | null;
+    confirmed: boolean;
+}>;
+
 type FetchedChannel<T> = T extends ChannelType.DM ? PartialGroupDMChannel | DMChannel | PartialDMChannel : T extends ChannelType.GuildText ? GuildBasedChannel & TextBasedChannel : T extends ChannelType.PublicThread | ChannelType.PrivateThread | ChannelType.AnnouncementThread ? AnyThreadChannel : T extends ChannelType.GuildVoice ? VoiceBasedChannel : T extends ChannelType.GuildCategory ? CategoryChannel : GuildBasedChannel;
 type FetchedMessageMention<T extends MentionType, InGuild extends boolean> = T extends "user" ? User : T extends "member" ? GuildMember : T extends "channel" ? InGuild extends true ? GuildBasedChannel : Channel : Role;
 type MentionType = "user" | "member" | "channel" | "role";
@@ -738,7 +746,7 @@ declare const _default: {
     fetchMessage(channel: discord_js.GuildTextBasedChannel | discord_js.VoiceBasedChannel, messageId: string | undefined | null): Promise<discord_js.Message | null>;
     customDJSConfig(config: jstools.DeepPartial<DJSConfig>): DJSConfig;
     djsConfig: DJSConfig;
-    default(handler: SendHandler, options: AwaitConfirmOptions): Promise<{
+    awaitConfirm(handler: SendHandler, options: AwaitConfirmOptions): Promise<{
         message: discord_js.Message | null;
         confirmed: boolean;
     }>;
@@ -748,4 +756,4 @@ declare const _default: {
     ANSIBuilder: typeof ANSIBuilder;
 };
 
-export { type ANSIBGColor, ANSIBuilder, type ANSIFormat, type ANSITextColor, type ANSITextOptions, type AwaitConfirmOptions, BetterEmbed, type BetterEmbedAuthor, type BetterEmbedData, type BetterEmbedFooter, type BetterEmbedTitle, CanvasBuilder, type CanvasOptions, type ColorHex, type DJSConfig, type DynaSendData, type DynaSendOptions, type EmbedResolveable, type ExtractionOptions, type FetchedChannel, type FetchedMessageMention, type GetMessageMentionOptions, type ImageOptions, type ImageResolveable, type InteractionBasedSendHandler, type InteractionResolveable, type MentionType, type MimeType, type NestedPageData, type PageData, PageNavigator, type PageNavigatorOptions, type PageResolveable, type PaginationEvent, type PaginationType, type SelectMenuOptionData, type SendHandler, type SendMethod, type SendMethodChannelBased, type SendMethodInteractionBased, type SendMethodMessageBased, type SendMethodUserBased, type SendOptions, type SendableTextChannel, type TextOptions, type UserResolvable, __zero, cleanMention, customDJSConfig, _default as default, deleteMessageAfter, djsConfig, dynaSend, extractMessage, fetchChannel, fetchGuild, fetchMember, fetchMessage, fetchRole, fetchUser, getFirstMentionId, getMessageMention, isMentionOrSnowflake };
+export { type ANSIBGColor, ANSIBuilder, type ANSIFormat, type ANSITextColor, type ANSITextOptions, type AwaitConfirmOptions, BetterEmbed, type BetterEmbedAuthor, type BetterEmbedData, type BetterEmbedFooter, type BetterEmbedTitle, CanvasBuilder, type CanvasOptions, type ColorHex, type DJSConfig, type DynaSendData, type DynaSendOptions, type EmbedResolveable, type ExtractionOptions, type FetchedChannel, type FetchedMessageMention, type GetMessageMentionOptions, type ImageOptions, type ImageResolveable, type InteractionBasedSendHandler, type InteractionResolveable, type MentionType, type MimeType, type NestedPageData, type PageData, PageNavigator, type PageNavigatorOptions, type PageResolveable, type PaginationEvent, type PaginationType, type SelectMenuOptionData, type SendHandler, type SendMethod, type SendMethodChannelBased, type SendMethodInteractionBased, type SendMethodMessageBased, type SendMethodUserBased, type SendOptions, type SendableTextChannel, type TextOptions, type UserResolvable, __zero, awaitConfirm, cleanMention, customDJSConfig, _default as default, deleteMessageAfter, djsConfig, dynaSend, extractMessage, fetchChannel, fetchGuild, fetchMember, fetchMessage, fetchRole, fetchUser, getFirstMentionId, getMessageMention, isMentionOrSnowflake };

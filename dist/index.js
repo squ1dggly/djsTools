@@ -35,6 +35,7 @@ __export(index_exports, {
   CanvasBuilder: () => CanvasBuilder,
   PageNavigator: () => PageNavigator,
   __zero: () => __zero,
+  awaitConfirm: () => awaitConfirm,
   cleanMention: () => cleanMention,
   customDJSConfig: () => customDJSConfig,
   default: () => index_default,
@@ -1375,7 +1376,7 @@ var PageNavigator = class {
 // src/awaitConfirm.ts
 var awaitConfirm_exports = {};
 __export(awaitConfirm_exports, {
-  default: () => awaitConfirm
+  awaitConfirm: () => awaitConfirm
 });
 var import_discord4 = require("discord.js");
 var import_jstools5 = require("jstools");
@@ -1607,6 +1608,7 @@ var index_default = {
   CanvasBuilder,
   PageNavigator,
   __zero,
+  awaitConfirm,
   cleanMention,
   customDJSConfig,
   deleteMessageAfter,

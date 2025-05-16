@@ -1342,7 +1342,7 @@ var PageNavigator = class {
 // src/awaitConfirm.ts
 var awaitConfirm_exports = {};
 __export(awaitConfirm_exports, {
-  default: () => awaitConfirm
+  awaitConfirm: () => awaitConfirm
 });
 import { ActionRowBuilder as ActionRowBuilder3, ButtonBuilder as ButtonBuilder2, ButtonStyle as ButtonStyle2, ComponentType } from "discord.js";
 import { parseTime as parseTime2 } from "jstools";
@@ -1573,6 +1573,7 @@ export {
   CanvasBuilder,
   PageNavigator,
   __zero,
+  awaitConfirm,
   cleanMention,
   customDJSConfig,
   index_default as default,

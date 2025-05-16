@@ -53,7 +53,7 @@ import { parseTime } from "jstools";
 /** Send a confirmation message and await the user's response.
 
  * This function utilizes {@link BetterEmbed} and {@link dynaSend}. */
-export default async function awaitConfirm(
+export async function awaitConfirm(
     handler: SendHandler,
     options: AwaitConfirmOptions
 ): Promise<{ message: Message | null; confirmed: boolean }> {
