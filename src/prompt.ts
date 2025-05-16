@@ -111,7 +111,7 @@ export async function prompt(
     if (!message) return { message: null, confirmed: false };
 
     /* - - - - - { Await the User's Decision } - - - - - */
-    const cleanUp = async (resolve: (...args: any) => void, confirmed: boolean) => {
+    const cleanUp = async (confirmed: boolean) => {
         // Delete the message ( CONFIRM )
         if (confirmed && (options.onResolve?.deleteOnConfirm ?? true)) {
             if (message?.deletable) await message.delete().catch(Boolean);
@@ -121,19 +121,12 @@ export async function prompt(
             if (message?.deletable) await message.delete().catch(Boolean);
         }
 
-        // Return and resolve the promise since the message was deleted
-        if ((options.onResolve?.deleteOnConfirm ?? true) || (options.onResolve?.deleteOnCancel ?? true))
-            return resolve(confirmed);
-
         // Disable the components
         if (options.onResolve?.disableComponents) {
             buttons.cancel.setDisabled(true);
             buttons.confirm.setDisabled(true);
             await message?.edit({ components: [actionRow] }).catch(Boolean);
         }
-
-        // Resolve the promise
-        return resolve({ message, confirmed });
     };
 
     // Map the allowed participants to their IDs
@@ -145,13 +138,16 @@ export async function prompt(
         const executeAction = async (customId: string) => {
             switch (customId) {
                 case "btn_confirm":
-                    return await cleanUp(resolve, true);
+                    await cleanUp(true);
+                    return resolve({ message, confirmed: true });
 
                 case "btn_cancel":
-                    return await cleanUp(resolve, false);
+                    await cleanUp(false);
+                    return resolve({ message, confirmed: false });
 
                 default:
-                    return await cleanUp(resolve, false);
+                    await cleanUp(false);
+                    return resolve({ message, confirmed: false });
             }
         };
 

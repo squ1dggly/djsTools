@@ -1414,32 +1414,32 @@ async function prompt(handler, options) {
     allowedMentions: options.allowedMentions
   });
   if (!message) return { message: null, confirmed: false };
-  const cleanUp = async (resolve, confirmed) => {
+  const cleanUp = async (confirmed) => {
     if (confirmed && (options.onResolve?.deleteOnConfirm ?? true)) {
       if (message?.deletable) await message.delete().catch(Boolean);
     }
     if (!confirmed && (options.onResolve?.deleteOnCancel ?? true)) {
       if (message?.deletable) await message.delete().catch(Boolean);
     }
-    if ((options.onResolve?.deleteOnConfirm ?? true) || (options.onResolve?.deleteOnCancel ?? true))
-      return resolve(confirmed);
     if (options.onResolve?.disableComponents) {
       buttons.cancel.setDisabled(true);
       buttons.confirm.setDisabled(true);
       await message?.edit({ components: [actionRow] }).catch(Boolean);
     }
-    return resolve({ message, confirmed });
   };
   const allowedParticipantIds = options.allowedParticipants ? options.allowedParticipants.map((m) => typeof m === "string" ? m : m?.id) : [];
   return new Promise(async (resolve) => {
     const executeAction = async (customId) => {
       switch (customId) {
         case "btn_confirm":
-          return await cleanUp(resolve, true);
+          await cleanUp(true);
+          return resolve({ message, confirmed: true });
         case "btn_cancel":
-          return await cleanUp(resolve, false);
+          await cleanUp(false);
+          return resolve({ message, confirmed: false });
         default:
-          return await cleanUp(resolve, false);
+          await cleanUp(false);
+          return resolve({ message, confirmed: false });
       }
     };
     await message.awaitMessageComponent({
