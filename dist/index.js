@@ -1427,8 +1427,8 @@ async function prompt(handler, options) {
       buttons.cancel.setDisabled(true);
       buttons.confirm.setDisabled(true);
       await message?.edit({ components: [actionRow] }).catch(Boolean);
-      return resolve({ message, confirmed });
     }
+    return resolve({ message, confirmed });
   };
   const allowedParticipantIds = options.allowedParticipants ? options.allowedParticipants.map((m) => typeof m === "string" ? m : m?.id) : [];
   return new Promise(async (resolve) => {

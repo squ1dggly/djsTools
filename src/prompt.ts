@@ -130,10 +130,10 @@ export async function prompt(
             buttons.cancel.setDisabled(true);
             buttons.confirm.setDisabled(true);
             await message?.edit({ components: [actionRow] }).catch(Boolean);
-
-            // Resolve the promise
-            return resolve({ message, confirmed });
         }
+
+        // Resolve the promise
+        return resolve({ message, confirmed });
     };
 
     // Map the allowed participants to their IDs
