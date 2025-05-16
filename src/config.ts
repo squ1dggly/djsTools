@@ -12,7 +12,7 @@ export interface DJSConfig {
         ERROR_MESSAGE: string | number;
     };
 
-    awaitConfirm: {
+    prompt: {
         DEFAULT_EMBED_TITLE: string;
         DEFAULT_EMBED_DESCRIPTION: string;
     };
@@ -81,7 +81,7 @@ export const djsConfig: DJSConfig = {
         ERROR_MESSAGE: "5s"
     },
 
-    awaitConfirm: {
+    prompt: {
         DEFAULT_EMBED_TITLE: "⚠️ Are you sure?",
         DEFAULT_EMBED_DESCRIPTION: "Carefully review your action and confirm your decision."
     },
@@ -146,7 +146,7 @@ export function customDJSConfig(config: DeepPartial<DJSConfig>): DJSConfig {
         DEV_MODE: config.DEV_MODE || djsConfig.DEV_MODE,
 
         timeouts: { ...config.timeouts, ...djsConfig.timeouts },
-        awaitConfirm: { ...config.awaitConfirm, ...djsConfig.awaitConfirm },
+        prompt: { ...config.prompt, ...djsConfig.prompt },
         pageNavigator: { ...config.pageNavigator, ...djsConfig.pageNavigator },
         ansi: { ...config.ansi, ...djsConfig.ansi }
     };

@@ -1,6 +1,6 @@
 import { SendHandler, EmbedResolveable, UserResolvable } from "./types";
 
-export interface AwaitConfirmOptions
+export interface PromptOptions
     extends Omit<
         DynaSendOptions,
         | "embeds"
@@ -53,9 +53,9 @@ import { parseTime } from "jstools";
 /** Send a confirmation message and await the user's response.
 
  * This function utilizes {@link BetterEmbed} and {@link dynaSend}. */
-export async function awaitConfirm(
+export async function prompt(
     handler: SendHandler,
-    options: AwaitConfirmOptions
+    options: PromptOptions
 ): Promise<{ message: Message | null; confirmed: boolean }> {
     const __config = options.config || djsConfig;
 
@@ -64,7 +64,7 @@ export async function awaitConfirm(
 
     /* error prevention ( START ) */
     if (options.timeout && (options.timeout as number) < 1000) {
-        console.log("[AwaitConfirm]: 'timeout' is less than 1 second. Is this intentional?");
+        console.log("[Prompt]: 'timeout' is less than 1 second. Is this intentional?");
     }
     /* error prevention ( END ) */
 
@@ -72,8 +72,8 @@ export async function awaitConfirm(
     const __embed =
         options.embed === undefined
             ? new BetterEmbed({
-                  title: __config.awaitConfirm.DEFAULT_EMBED_TITLE,
-                  description: __config.awaitConfirm.DEFAULT_EMBED_DESCRIPTION
+                  title: __config.prompt.DEFAULT_EMBED_TITLE,
+                  description: __config.prompt.DEFAULT_EMBED_DESCRIPTION
               })
             : options.embed === null
             ? undefined

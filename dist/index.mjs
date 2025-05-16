@@ -26,7 +26,7 @@ var djsConfig = {
     CONFIRMATION: "15s",
     ERROR_MESSAGE: "5s"
   },
-  awaitConfirm: {
+  prompt: {
     DEFAULT_EMBED_TITLE: "\u26A0\uFE0F Are you sure?",
     DEFAULT_EMBED_DESCRIPTION: "Carefully review your action and confirm your decision."
   },
@@ -82,7 +82,7 @@ function customDJSConfig(config) {
     EMBED_COLOR_DEV: config.EMBED_COLOR_DEV || djsConfig.EMBED_COLOR_DEV,
     DEV_MODE: config.DEV_MODE || djsConfig.DEV_MODE,
     timeouts: { ...config.timeouts, ...djsConfig.timeouts },
-    awaitConfirm: { ...config.awaitConfirm, ...djsConfig.awaitConfirm },
+    prompt: { ...config.prompt, ...djsConfig.prompt },
     pageNavigator: { ...config.pageNavigator, ...djsConfig.pageNavigator },
     ansi: { ...config.ansi, ...djsConfig.ansi }
   };
@@ -1339,22 +1339,22 @@ var PageNavigator = class {
   }
 };
 
-// src/awaitConfirm.ts
-var awaitConfirm_exports = {};
-__export(awaitConfirm_exports, {
-  awaitConfirm: () => awaitConfirm
+// src/prompt.ts
+var prompt_exports = {};
+__export(prompt_exports, {
+  prompt: () => prompt
 });
 import { ActionRowBuilder as ActionRowBuilder3, ButtonBuilder as ButtonBuilder2, ButtonStyle as ButtonStyle2, ComponentType } from "discord.js";
 import { parseTime as parseTime2 } from "jstools";
-async function awaitConfirm(handler, options) {
+async function prompt(handler, options) {
   const __config = options.config || djsConfig;
   options.timeout = parseTime2(options.timeout || __config.timeouts.CONFIRMATION);
   if (options.timeout && options.timeout < 1e3) {
-    console.log("[AwaitConfirm]: 'timeout' is less than 1 second. Is this intentional?");
+    console.log("[Prompt]: 'timeout' is less than 1 second. Is this intentional?");
   }
   const __embed = options.embed === void 0 ? new BetterEmbed({
-    title: __config.awaitConfirm.DEFAULT_EMBED_TITLE,
-    description: __config.awaitConfirm.DEFAULT_EMBED_DESCRIPTION
+    title: __config.prompt.DEFAULT_EMBED_TITLE,
+    description: __config.prompt.DEFAULT_EMBED_DESCRIPTION
   }) : options.embed === null ? void 0 : options.embed;
   const buttons = {
     confirm: new ButtonBuilder2({
@@ -1559,7 +1559,7 @@ var index_default = {
   ...BetterEmbed_exports,
   ...CanvasBuilder_exports,
   ...PageNavigator_exports,
-  ...awaitConfirm_exports,
+  ...prompt_exports,
   ...config_exports,
   ...dTools_exports,
   ...deleteMessageAfter_exports,
@@ -1573,7 +1573,6 @@ export {
   CanvasBuilder,
   PageNavigator,
   __zero,
-  awaitConfirm,
   cleanMention,
   customDJSConfig,
   index_default as default,
@@ -1589,5 +1588,6 @@ export {
   fetchUser,
   getFirstMentionId,
   getMessageMention,
-  isMentionOrSnowflake
+  isMentionOrSnowflake,
+  prompt
 };

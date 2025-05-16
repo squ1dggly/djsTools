@@ -35,7 +35,6 @@ __export(index_exports, {
   CanvasBuilder: () => CanvasBuilder,
   PageNavigator: () => PageNavigator,
   __zero: () => __zero,
-  awaitConfirm: () => awaitConfirm,
   cleanMention: () => cleanMention,
   customDJSConfig: () => customDJSConfig,
   default: () => index_default,
@@ -51,7 +50,8 @@ __export(index_exports, {
   fetchUser: () => fetchUser,
   getFirstMentionId: () => getFirstMentionId,
   getMessageMention: () => getMessageMention,
-  isMentionOrSnowflake: () => isMentionOrSnowflake
+  isMentionOrSnowflake: () => isMentionOrSnowflake,
+  prompt: () => prompt
 });
 module.exports = __toCommonJS(index_exports);
 
@@ -77,7 +77,7 @@ var djsConfig = {
     CONFIRMATION: "15s",
     ERROR_MESSAGE: "5s"
   },
-  awaitConfirm: {
+  prompt: {
     DEFAULT_EMBED_TITLE: "\u26A0\uFE0F Are you sure?",
     DEFAULT_EMBED_DESCRIPTION: "Carefully review your action and confirm your decision."
   },
@@ -133,7 +133,7 @@ function customDJSConfig(config) {
     EMBED_COLOR_DEV: config.EMBED_COLOR_DEV || djsConfig.EMBED_COLOR_DEV,
     DEV_MODE: config.DEV_MODE || djsConfig.DEV_MODE,
     timeouts: { ...config.timeouts, ...djsConfig.timeouts },
-    awaitConfirm: { ...config.awaitConfirm, ...djsConfig.awaitConfirm },
+    prompt: { ...config.prompt, ...djsConfig.prompt },
     pageNavigator: { ...config.pageNavigator, ...djsConfig.pageNavigator },
     ansi: { ...config.ansi, ...djsConfig.ansi }
   };
@@ -1373,22 +1373,22 @@ var PageNavigator = class {
   }
 };
 
-// src/awaitConfirm.ts
-var awaitConfirm_exports = {};
-__export(awaitConfirm_exports, {
-  awaitConfirm: () => awaitConfirm
+// src/prompt.ts
+var prompt_exports = {};
+__export(prompt_exports, {
+  prompt: () => prompt
 });
 var import_discord4 = require("discord.js");
 var import_jstools5 = require("jstools");
-async function awaitConfirm(handler, options) {
+async function prompt(handler, options) {
   const __config = options.config || djsConfig;
   options.timeout = (0, import_jstools5.parseTime)(options.timeout || __config.timeouts.CONFIRMATION);
   if (options.timeout && options.timeout < 1e3) {
-    console.log("[AwaitConfirm]: 'timeout' is less than 1 second. Is this intentional?");
+    console.log("[Prompt]: 'timeout' is less than 1 second. Is this intentional?");
   }
   const __embed = options.embed === void 0 ? new BetterEmbed({
-    title: __config.awaitConfirm.DEFAULT_EMBED_TITLE,
-    description: __config.awaitConfirm.DEFAULT_EMBED_DESCRIPTION
+    title: __config.prompt.DEFAULT_EMBED_TITLE,
+    description: __config.prompt.DEFAULT_EMBED_DESCRIPTION
   }) : options.embed === null ? void 0 : options.embed;
   const buttons = {
     confirm: new import_discord4.ButtonBuilder({
@@ -1593,7 +1593,7 @@ var index_default = {
   ...BetterEmbed_exports,
   ...CanvasBuilder_exports,
   ...PageNavigator_exports,
-  ...awaitConfirm_exports,
+  ...prompt_exports,
   ...config_exports,
   ...dTools_exports,
   ...deleteMessageAfter_exports,
@@ -1608,7 +1608,6 @@ var index_default = {
   CanvasBuilder,
   PageNavigator,
   __zero,
-  awaitConfirm,
   cleanMention,
   customDJSConfig,
   deleteMessageAfter,
@@ -1623,5 +1622,6 @@ var index_default = {
   fetchUser,
   getFirstMentionId,
   getMessageMention,
-  isMentionOrSnowflake
+  isMentionOrSnowflake,
+  prompt
 });

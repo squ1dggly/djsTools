@@ -2,7 +2,7 @@ export * from "./AnsiBuilder";
 export * from "./BetterEmbed";
 export * from "./CanvasBuilder";
 export * from "./PageNavigator";
-export * from "./awaitConfirm";
+export * from "./prompt";
 export * from "./config";
 export * from "./dTools";
 export * from "./deleteMessageAfter";
@@ -14,7 +14,7 @@ import * as AnsiBuilder from "./AnsiBuilder";
 import * as BetterEmbed from "./BetterEmbed";
 import * as CanvasBuilder from "./CanvasBuilder";
 import * as PageNavigator from "./PageNavigator";
-import * as awaitConfirm from "./awaitConfirm";
+import * as prompt from "./prompt";
 import * as djsConfig from "./config";
 import * as dTools from "./dTools";
 import * as deleteMessageAfter from "./deleteMessageAfter";
@@ -27,7 +27,7 @@ export default {
     ...BetterEmbed,
     ...CanvasBuilder,
     ...PageNavigator,
-    ...awaitConfirm,
+    ...prompt,
     ...djsConfig,
     ...dTools,
     ...deleteMessageAfter,
