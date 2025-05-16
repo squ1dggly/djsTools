@@ -550,31 +550,31 @@ declare class PageNavigator {
     private collect_all;
     private handlePostTimeout;
     constructor(options: PageNavigatorOptions);
-    on(event: "pageChanged", listener: (page: PageData | NestedPageData, index: {
+    on(event: "pageChanged", listener: (page: PageData | NestedPageData, pageIndex: {
         current: number;
         nested: number;
     }) => any, once?: boolean): this;
-    on(event: "pageBack", listener: (page: PageData | NestedPageData, index: {
+    on(event: "pageBack", listener: (page: PageData | NestedPageData, pageIndex: {
         current: number;
         nested: number;
     }) => any, once?: boolean): this;
-    on(event: "pageNext", listener: (page: PageData | NestedPageData, index: {
+    on(event: "pageNext", listener: (page: PageData | NestedPageData, pageIndex: {
         current: number;
         nested: number;
     }) => any, once?: boolean): this;
-    on(event: "pageJumped", listener: (page: PageData | NestedPageData, index: {
+    on(event: "pageJumped", listener: (page: PageData | NestedPageData, pageIndex: {
         current: number;
         nested: number;
     }) => any, once?: boolean): this;
-    on(event: "selectMenuOptionPicked", listener: (page: PageData | NestedPageData, option: SelectMenuOptionData, index: {
+    on(event: "selectMenuOptionPicked", listener: (page: PageData | NestedPageData, option: SelectMenuOptionData, pageIndex: {
         current: number;
         nested: number;
     }) => any, once?: boolean): this;
-    on<T extends CacheType>(event: "collect", listener: (interaction: StringSelectMenuInteraction<T> | ButtonInteraction<T>, page: PageData | NestedPageData, index: {
+    on<T extends CacheType>(event: "collect", listener: (interaction: StringSelectMenuInteraction<T> | ButtonInteraction<T>, page: PageData | NestedPageData, pageIndex: {
         current: number;
         nested: number;
     }) => any, once?: boolean): this;
-    on(event: "react", listener: (reaction: MessageReaction, user: User, page: PageData | NestedPageData, index: {
+    on(event: "react", listener: (reaction: MessageReaction, user: User, page: PageData | NestedPageData, pageIndex: {
         current: number;
         nested: number;
     }) => any, once?: boolean): this;

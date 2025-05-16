@@ -777,22 +777,22 @@ export class PageNavigator {
 
     on(
         event: "pageChanged",
-        listener: (page: PageData | NestedPageData, index: { current: number; nested: number }) => any,
+        listener: (page: PageData | NestedPageData, pageIndex: { current: number; nested: number }) => any,
         once?: boolean
     ): this;
     on(
         event: "pageBack",
-        listener: (page: PageData | NestedPageData, index: { current: number; nested: number }) => any,
+        listener: (page: PageData | NestedPageData, pageIndex: { current: number; nested: number }) => any,
         once?: boolean
     ): this;
     on(
         event: "pageNext",
-        listener: (page: PageData | NestedPageData, index: { current: number; nested: number }) => any,
+        listener: (page: PageData | NestedPageData, pageIndex: { current: number; nested: number }) => any,
         once?: boolean
     ): this;
     on(
         event: "pageJumped",
-        listener: (page: PageData | NestedPageData, index: { current: number; nested: number }) => any,
+        listener: (page: PageData | NestedPageData, pageIndex: { current: number; nested: number }) => any,
         once?: boolean
     ): this;
     on(
@@ -800,7 +800,7 @@ export class PageNavigator {
         listener: (
             page: PageData | NestedPageData,
             option: SelectMenuOptionData,
-            index: { current: number; nested: number }
+            pageIndex: { current: number; nested: number }
         ) => any,
         once?: boolean
     ): this;
@@ -809,7 +809,7 @@ export class PageNavigator {
         listener: (
             interaction: StringSelectMenuInteraction<T> | ButtonInteraction<T>,
             page: PageData | NestedPageData,
-            index: { current: number; nested: number }
+            pageIndex: { current: number; nested: number }
         ) => any,
         once?: boolean
     ): this;
@@ -819,7 +819,7 @@ export class PageNavigator {
             reaction: MessageReaction,
             user: User,
             page: PageData | NestedPageData,
-            index: { current: number; nested: number }
+            pageIndex: { current: number; nested: number }
         ) => any,
         once?: boolean
     ): this;
