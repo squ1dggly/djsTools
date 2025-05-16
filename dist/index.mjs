@@ -1001,7 +1001,7 @@ var PageNavigator = class {
       collector.on("collect", async (i) => {
         if (!i.isStringSelectMenu() && !i.isButton()) return;
         collector.resetTimer();
-        this.callEventStack("collect", i, this.data.page.currentData);
+        this.callEventStack("collect", i, this.data.page.currentData, this.data.page.index);
         try {
           switch (i.customId) {
             case "ssm_pageSelect":
@@ -1014,39 +1014,39 @@ var PageNavigator = class {
                 "selectMenuOptionPicked",
                 this.data.page.currentData,
                 this.data.components.selectMenu.options[_ssmOptionIndex],
-                this.data.page.index.current
+                this.data.page.index
               );
-              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.current);
+              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
               return await this.refresh();
             case "btn_to_first":
               await i.deferUpdate().catch(Boolean);
               this.setPage(this.data.page.index.current, 0);
-              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.nested);
+              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
               return await this.refresh();
             case "btn_back":
               await i.deferUpdate().catch(Boolean);
               this.setPage(this.data.page.index.current, this.data.page.index.nested - 1);
               this.callEventStack("pageBack", this.data.page.currentData, this.data.page.index.nested);
-              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.nested);
+              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
               return await this.refresh();
             case "btn_jump":
               await i.deferUpdate().catch(Boolean);
               let jumpIndex = await this.askPageNumber(i.user);
               if (jumpIndex === null) return;
               this.setPage(this.data.page.index.current, jumpIndex);
-              this.callEventStack("pageJumped", this.data.page.currentData, this.data.page.index.nested);
-              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.nested);
+              this.callEventStack("pageJumped", this.data.page.currentData, this.data.page.index);
+              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
               return await this.refresh();
             case "btn_next":
               await i.deferUpdate().catch(Boolean);
               this.setPage(this.data.page.index.current, this.data.page.index.nested + 1);
-              this.callEventStack("pageNext", this.data.page.currentData, this.data.page.index.nested);
-              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.nested);
+              this.callEventStack("pageNext", this.data.page.currentData, this.data.page.index);
+              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
               return await this.refresh();
             case "btn_to_last":
               await i.deferUpdate().catch(Boolean);
               this.setPage(this.data.page.index.current, this.options.pages.length - 1);
-              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.nested);
+              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
               return await this.refresh();
           }
         } catch (err) {
@@ -1078,33 +1078,33 @@ var PageNavigator = class {
         if (user.id !== reaction.message.guild?.members?.me?.id) await reaction.users.remove(user.id);
         if (allowedParticipantIds.length && !allowedParticipantIds.includes(user.id)) return;
         collector.resetTimer();
-        this.callEventStack("react", reaction, user, this.data.page.currentData);
+        this.callEventStack("react", reaction, user, this.data.page.currentData, this.data.page.index);
         try {
           switch (reaction.emoji.name) {
             case this.options.config.pageNavigator.buttons.to_first.emoji.name:
               this.setPage(this.data.page.index.current, 0);
-              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.current);
+              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
               return await this.refresh();
             case this.options.config.pageNavigator.buttons.back.emoji.name:
               this.setPage(this.data.page.index.current, this.data.page.index.nested - 1);
-              this.callEventStack("pageBack", this.data.page.currentData, this.data.page.index.nested);
-              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.current);
+              this.callEventStack("pageBack", this.data.page.currentData, this.data.page.index);
+              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
               return await this.refresh();
             case this.options.config.pageNavigator.buttons.jump.emoji.name:
               let jumpIndex = await this.askPageNumber(user);
               if (jumpIndex === null) return;
               this.setPage(this.data.page.index.current, jumpIndex);
-              this.callEventStack("pageJumped", this.data.page.currentData, this.data.page.index.nested);
-              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.current);
+              this.callEventStack("pageJumped", this.data.page.currentData, this.data.page.index);
+              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
               return await this.refresh();
             case this.options.config.pageNavigator.buttons.next.emoji.name:
               this.setPage(this.data.page.index.current, this.data.page.index.nested + 1);
-              this.callEventStack("pageNext", this.data.page.currentData, this.data.page.index.nested);
-              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.current);
+              this.callEventStack("pageNext", this.data.page.currentData, this.data.page.index);
+              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
               return await this.refresh();
             case this.options.config.pageNavigator.buttons.to_last.emoji.name:
               this.setPage(this.data.page.index.current, this.options.pages.length - 1);
-              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.current);
+              this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
               return await this.refresh();
           }
         } catch (err) {

@@ -470,7 +470,7 @@ export class PageNavigator {
                 collector.resetTimer();
 
                 // Call the 'collect' event stack
-                this.callEventStack("collect", i, this.data.page.currentData);
+                this.callEventStack("collect", i, this.data.page.currentData, this.data.page.index);
 
                 try {
                     switch (i.customId) {
@@ -484,22 +484,22 @@ export class PageNavigator {
                                 "selectMenuOptionPicked",
                                 this.data.page.currentData,
                                 this.data.components.selectMenu.options[_ssmOptionIndex],
-                                this.data.page.index.current
+                                this.data.page.index
                             );
-                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.current);
+                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
                             return await this.refresh();
 
                         case "btn_to_first":
                             await i.deferUpdate().catch(Boolean);
                             this.setPage(this.data.page.index.current, 0);
-                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.nested);
+                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
                             return await this.refresh();
 
                         case "btn_back":
                             await i.deferUpdate().catch(Boolean);
                             this.setPage(this.data.page.index.current, this.data.page.index.nested - 1);
                             this.callEventStack("pageBack", this.data.page.currentData, this.data.page.index.nested);
-                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.nested);
+                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
                             return await this.refresh();
 
                         case "btn_jump":
@@ -507,21 +507,21 @@ export class PageNavigator {
                             let jumpIndex = await this.askPageNumber(i.user);
                             if (jumpIndex === null) return;
                             this.setPage(this.data.page.index.current, jumpIndex);
-                            this.callEventStack("pageJumped", this.data.page.currentData, this.data.page.index.nested);
-                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.nested);
+                            this.callEventStack("pageJumped", this.data.page.currentData, this.data.page.index);
+                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
                             return await this.refresh();
 
                         case "btn_next":
                             await i.deferUpdate().catch(Boolean);
                             this.setPage(this.data.page.index.current, this.data.page.index.nested + 1);
-                            this.callEventStack("pageNext", this.data.page.currentData, this.data.page.index.nested);
-                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.nested);
+                            this.callEventStack("pageNext", this.data.page.currentData, this.data.page.index);
+                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
                             return await this.refresh();
 
                         case "btn_to_last":
                             await i.deferUpdate().catch(Boolean);
                             this.setPage(this.data.page.index.current, this.options.pages.length - 1);
-                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.nested);
+                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
                             return await this.refresh();
                     }
                 } catch (err) {
@@ -572,38 +572,38 @@ export class PageNavigator {
                 collector.resetTimer();
 
                 // Call the 'reaction' event stack
-                this.callEventStack("react", reaction, user, this.data.page.currentData);
+                this.callEventStack("react", reaction, user, this.data.page.currentData, this.data.page.index);
 
                 try {
                     switch (reaction.emoji.name) {
                         case this.options.config.pageNavigator.buttons.to_first.emoji.name:
                             this.setPage(this.data.page.index.current, 0);
-                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.current);
+                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
                             return await this.refresh();
 
                         case this.options.config.pageNavigator.buttons.back.emoji.name:
                             this.setPage(this.data.page.index.current, this.data.page.index.nested - 1);
-                            this.callEventStack("pageBack", this.data.page.currentData, this.data.page.index.nested);
-                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.current);
+                            this.callEventStack("pageBack", this.data.page.currentData, this.data.page.index);
+                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
                             return await this.refresh();
 
                         case this.options.config.pageNavigator.buttons.jump.emoji.name:
                             let jumpIndex = await this.askPageNumber(user);
                             if (jumpIndex === null) return;
                             this.setPage(this.data.page.index.current, jumpIndex);
-                            this.callEventStack("pageJumped", this.data.page.currentData, this.data.page.index.nested);
-                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.current);
+                            this.callEventStack("pageJumped", this.data.page.currentData, this.data.page.index);
+                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
                             return await this.refresh();
 
                         case this.options.config.pageNavigator.buttons.next.emoji.name:
                             this.setPage(this.data.page.index.current, this.data.page.index.nested + 1);
-                            this.callEventStack("pageNext", this.data.page.currentData, this.data.page.index.nested);
-                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.current);
+                            this.callEventStack("pageNext", this.data.page.currentData, this.data.page.index);
+                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
                             return await this.refresh();
 
                         case this.options.config.pageNavigator.buttons.to_last.emoji.name:
                             this.setPage(this.data.page.index.current, this.options.pages.length - 1);
-                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index.current);
+                            this.callEventStack("pageChanged", this.data.page.currentData, this.data.page.index);
                             return await this.refresh();
                     }
                 } catch (err) {
@@ -775,26 +775,52 @@ export class PageNavigator {
         this.configure_all();
     }
 
-    on(event: "pageChanged", listener: (page: PageData | NestedPageData, index: number) => any, once?: boolean): this;
-    on(event: "pageBack", listener: (page: PageData | NestedPageData, index: number) => any, once?: boolean): this;
-    on(event: "pageNext", listener: (page: PageData | NestedPageData, index: number) => any, once?: boolean): this;
-    on(event: "pageJumped", listener: (page: PageData | NestedPageData, index: number) => any, once?: boolean): this;
+    on(
+        event: "pageChanged",
+        listener: (page: PageData | NestedPageData, index: { current: number; nested: number }) => any,
+        once?: boolean
+    ): this;
+    on(
+        event: "pageBack",
+        listener: (page: PageData | NestedPageData, index: { current: number; nested: number }) => any,
+        once?: boolean
+    ): this;
+    on(
+        event: "pageNext",
+        listener: (page: PageData | NestedPageData, index: { current: number; nested: number }) => any,
+        once?: boolean
+    ): this;
+    on(
+        event: "pageJumped",
+        listener: (page: PageData | NestedPageData, index: { current: number; nested: number }) => any,
+        once?: boolean
+    ): this;
     on(
         event: "selectMenuOptionPicked",
-        listener: (page: PageData | NestedPageData, option: SelectMenuOptionData, index: number) => any,
+        listener: (
+            page: PageData | NestedPageData,
+            option: SelectMenuOptionData,
+            index: { current: number; nested: number }
+        ) => any,
         once?: boolean
     ): this;
     on<T extends CacheType>(
         event: "collect",
         listener: (
             interaction: StringSelectMenuInteraction<T> | ButtonInteraction<T>,
-            page: PageData | NestedPageData
+            page: PageData | NestedPageData,
+            index: { current: number; nested: number }
         ) => any,
         once?: boolean
     ): this;
     on(
         event: "react",
-        listener: (reaction: MessageReaction, user: User, page: PageData | NestedPageData) => any,
+        listener: (
+            reaction: MessageReaction,
+            user: User,
+            page: PageData | NestedPageData,
+            index: { current: number; nested: number }
+        ) => any,
         once?: boolean
     ): this;
     on(event: "timeout", listener: (message: Message) => any, once?: boolean): this;

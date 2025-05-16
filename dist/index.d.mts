@@ -550,13 +550,34 @@ declare class PageNavigator {
     private collect_all;
     private handlePostTimeout;
     constructor(options: PageNavigatorOptions);
-    on(event: "pageChanged", listener: (page: PageData | NestedPageData, index: number) => any, once?: boolean): this;
-    on(event: "pageBack", listener: (page: PageData | NestedPageData, index: number) => any, once?: boolean): this;
-    on(event: "pageNext", listener: (page: PageData | NestedPageData, index: number) => any, once?: boolean): this;
-    on(event: "pageJumped", listener: (page: PageData | NestedPageData, index: number) => any, once?: boolean): this;
-    on(event: "selectMenuOptionPicked", listener: (page: PageData | NestedPageData, option: SelectMenuOptionData, index: number) => any, once?: boolean): this;
-    on<T extends CacheType>(event: "collect", listener: (interaction: StringSelectMenuInteraction<T> | ButtonInteraction<T>, page: PageData | NestedPageData) => any, once?: boolean): this;
-    on(event: "react", listener: (reaction: MessageReaction, user: User, page: PageData | NestedPageData) => any, once?: boolean): this;
+    on(event: "pageChanged", listener: (page: PageData | NestedPageData, index: {
+        current: number;
+        nested: number;
+    }) => any, once?: boolean): this;
+    on(event: "pageBack", listener: (page: PageData | NestedPageData, index: {
+        current: number;
+        nested: number;
+    }) => any, once?: boolean): this;
+    on(event: "pageNext", listener: (page: PageData | NestedPageData, index: {
+        current: number;
+        nested: number;
+    }) => any, once?: boolean): this;
+    on(event: "pageJumped", listener: (page: PageData | NestedPageData, index: {
+        current: number;
+        nested: number;
+    }) => any, once?: boolean): this;
+    on(event: "selectMenuOptionPicked", listener: (page: PageData | NestedPageData, option: SelectMenuOptionData, index: {
+        current: number;
+        nested: number;
+    }) => any, once?: boolean): this;
+    on<T extends CacheType>(event: "collect", listener: (interaction: StringSelectMenuInteraction<T> | ButtonInteraction<T>, page: PageData | NestedPageData, index: {
+        current: number;
+        nested: number;
+    }) => any, once?: boolean): this;
+    on(event: "react", listener: (reaction: MessageReaction, user: User, page: PageData | NestedPageData, index: {
+        current: number;
+        nested: number;
+    }) => any, once?: boolean): this;
     on(event: "timeout", listener: (message: Message) => any, once?: boolean): this;
     /** Add one or more options to the select menu component. */
     addSelectMenuOptions(...options: SelectMenuOptionData[]): this;
