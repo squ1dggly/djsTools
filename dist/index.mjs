@@ -423,7 +423,7 @@ var BetterEmbed = class _BetterEmbed {
     this.addFields(this.data.fields, true);
     this.setColor(
       choice(
-        this.data.config.DEV_MODE ? this.data.config.EMBED_COLOR_DEV : this.data.config.EMBED_COLOR
+        this.data.color || this.data.config.DEV_MODE ? this.data.config.EMBED_COLOR_DEV : this.data.config.EMBED_COLOR
       )
     );
     this.setTimestamp();
@@ -486,11 +486,11 @@ var BetterEmbed = class _BetterEmbed {
   setTitle(title = this.data.title) {
     let _thisTitle = this.data.title;
     if (title === null)
-      this.data.author = structuredClone(this.dataInit.title);
+      this.data.title = structuredClone(this.dataInit.title);
     else if (typeof title === "string")
-      this.data.author = { ..._thisTitle, text: title };
+      this.data.title = { ..._thisTitle, text: title };
     else
-      this.data.author = { ..._thisTitle, ...title };
+      this.data.title = { ..._thisTitle, ...title };
     this.parseData();
     if (_thisTitle.text) {
       this.embed.setTitle(_thisTitle.text);

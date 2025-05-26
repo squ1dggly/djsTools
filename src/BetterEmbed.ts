@@ -286,7 +286,9 @@ export class BetterEmbed {
         this.addFields(this.data.fields, true);
         this.setColor(
             choice(
-                this.data.config!.DEV_MODE ? this.data.config!.EMBED_COLOR_DEV : this.data.config!.EMBED_COLOR
+                this.data.color || this.data.config!.DEV_MODE
+                    ? this.data.config!.EMBED_COLOR_DEV
+                    : this.data.config!.EMBED_COLOR
             ) as HexColorString
         );
         this.setTimestamp();
@@ -364,11 +366,11 @@ export class BetterEmbed {
 
         // prettier-ignore
         if (title === null)
-            this.data.author = structuredClone(this.dataInit.title);
+            this.data.title = structuredClone(this.dataInit.title);
         else if (typeof title === "string")
-            this.data.author = { ..._thisTitle, text: title };
+            this.data.title = { ..._thisTitle, text: title };
         else
-            this.data.author = { ..._thisTitle, ...title };
+            this.data.title = { ..._thisTitle, ...title };
 
         // Parse the updated author data
         this.parseData();
