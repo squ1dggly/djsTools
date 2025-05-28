@@ -639,7 +639,7 @@ interface PromptOptions extends Omit<DynaSendOptions, "embeds" | "components" | 
         disableComponents?: boolean;
     };
     /** A custom DJS config. */
-    config?: DJSConfig;
+    config?: Partial<DJSConfig>;
 }
 
 /** Send a confirmation message and await the user's response.

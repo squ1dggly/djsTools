@@ -40,13 +40,13 @@ export interface PromptOptions
     };
 
     /** A custom DJS config. */
-    config?: DJSConfig;
+    config?: Partial<DJSConfig>;
 }
 
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, Message } from "discord.js";
 
 import { DynaSendOptions, dynaSend } from "./dynaSend";
-import { DJSConfig, djsConfig } from "./config";
+import { customDJSConfig, DJSConfig, djsConfig } from "./config";
 import { BetterEmbed } from "./BetterEmbed";
 import { parseTime } from "jstools";
 
@@ -57,7 +57,7 @@ export async function prompt(
     handler: SendHandler,
     options: PromptOptions
 ): Promise<{ message: Message | null; confirmed: boolean }> {
-    const __config = options.config || djsConfig;
+    const __config = options.config ? customDJSConfig(options.config) : djsConfig;
 
     // Parse timeout
     options.timeout = parseTime(options.timeout || __config.timeouts.CONFIRMATION);

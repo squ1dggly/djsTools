@@ -1347,7 +1347,7 @@ __export(prompt_exports, {
 import { ActionRowBuilder as ActionRowBuilder3, ButtonBuilder as ButtonBuilder2, ButtonStyle as ButtonStyle2, ComponentType } from "discord.js";
 import { parseTime as parseTime2 } from "jstools";
 async function prompt(handler, options) {
-  const __config = options.config || djsConfig;
+  const __config = options.config ? customDJSConfig(options.config) : djsConfig;
   options.timeout = parseTime2(options.timeout || __config.timeouts.CONFIRMATION);
   if (options.timeout && options.timeout < 1e3) {
     console.log("[Prompt]: 'timeout' is less than 1 second. Is this intentional?");
