@@ -285,11 +285,9 @@ export class BetterEmbed {
         this.setFooter();
         this.addFields(this.data.fields, true);
         this.setColor(
-            choice(
-                this.data.color || this.data.config!.DEV_MODE
-                    ? this.data.config!.EMBED_COLOR_DEV
-                    : this.data.config!.EMBED_COLOR
-            ) as HexColorString
+            this.data.color
+                ? undefined
+                : ((this.data.config?.DEV_MODE ? this.data.config.EMBED_COLOR_DEV : this.data.config?.EMBED_COLOR) as any)
         );
         this.setTimestamp();
     }

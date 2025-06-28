@@ -462,9 +462,7 @@ var BetterEmbed = class _BetterEmbed {
     this.setFooter();
     this.addFields(this.data.fields, true);
     this.setColor(
-      (0, import_jstools3.choice)(
-        this.data.color || this.data.config.DEV_MODE ? this.data.config.EMBED_COLOR_DEV : this.data.config.EMBED_COLOR
-      )
+      this.data.color ? void 0 : this.data.config?.DEV_MODE ? this.data.config.EMBED_COLOR_DEV : this.data.config?.EMBED_COLOR
     );
     this.setTimestamp();
   }
